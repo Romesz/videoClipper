@@ -4,7 +4,7 @@ canvas {
 #imageSilder {
   height: 100px;
   width: 100%;
-  overflow: hidden;
+  /*overflow: hidden;*/
   
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -14,7 +14,7 @@ canvas {
     display: inline-block;
     border: 1px solid red;
     height: 90px;
-    width: 100px;
+    /*width: 100px;*/
   }
   #rightContainer {
     display: inline-block;

@@ -24,7 +24,7 @@
     var interval = null;
     
     var isWidth = imageSilder[0].clientWidth;
-    var rcWidth = resizableContainer[0].clientWidth / 100;
+    var rescWidth = resizableContainer[0].clientWidth / 100;
 
     var img = null;
     
@@ -42,7 +42,7 @@
           var imgCounter = 0;
           
           for(var index in img) {
-            if(imgCounter === rcWidth)
+            if(imgCounter === rescWidth)
               return;
             
             img[index].style.opacity = 1;
@@ -112,76 +112,106 @@
     }; 
     */
     
+    var lcWidth = 0;
+    var rcWidth = 200;
+    
     $scope.left = function() {
-      /*
-      var rcImgLast = null;
-      for(var i = rcImgs.length; i > 0  ; i--) {
-        rcImgFirst = rcImgs[i - 1];
-        console.log(rcImgFirst);
-        //rcImgs[i].style = 'opacity: 0.4;';  // does not work
-        //rcImgs[i].remove();
-        break;
-      }
-      //resizableContainer[0].appendChild(rcImgLast);
-      */ 
-      
       var lcImgs = leftContainer.find('img');
       var lcImglast = null;
       
       if(lcImgs.length === 0) {
+        console.log('LEFT - no elem');
         return;
       } else if(lcImgs.length === 1) {
         lcImglast = lcImgs[0];
       } else {
       
         for(var i = lcImgs.length; i > 0  ; i--) {
-          lcImglast = lcImgs[i];
-          console.log(lcImgs[i]);
-          //lcImglast[i].style = 'opacity: 1;';  // does not work
-          //lcImglast[i].style.opacity = 1;
-          //lcImglast[i].remove();
+          lcImglast = lcImgs[i - 1];
           break;
         }
       }
+      lcImglast.style.opacity = 1;
+      resizableContainer[0].insertBefore(lcImglast, resizableContainer[0].firstChild);
       
-      resizableContainer[0].appendChild(lcImglast);
-      //insertBefore
-      
-    };
+      if(lcWidth !== 0) {
+        lcWidth -= 100;
+        leftContainer.css('width', lcWidth + 'px');  
+      }
 
+      
+      var rescLen = resizableContainer.find('img').length;
+      if(rescLen <= 8) {
+        return;
+      }
+      
+      rcWidth += 100;
+      rightContainer.css('width', rcWidth + 'px');
+      
+      var rcImgs = resizableContainer.find('img');
+      var rcImglast = null;
+
+      if(rcImgs.length === 0) {
+        console.log('LEFT - no elem');
+        return;
+      } else if(rcImgs.length === 1) {
+        rcImglast = rcImgs[0];
+      } else {
+
+        for(var i = rcImgs.length; i > 0  ; i--) {
+          rcImglast = rcImgs[i - 1];
+          break;
+        }
+      }
+      rcImglast.style.opacity = 0.4;
+      rightContainer[0].insertBefore(rcImglast, rightContainer[0].firstChild);
+      
+      // here is the problem
+    };
+    
     $scope.right = function() {      
       var rcImgs = resizableContainer.find('img');
       var rcImgFirst = null;
       
-      for(var i in rcImgs) {
-        rcImgFirst = rcImgs[i];
-        console.log(rcImgFirst);
-        //rcImgs[i].style = 'opacity: 0.4;';  // does not work
-        //rcImgFirst[i].style.opacity = 0.4;
-        rcImgs[i].remove();
-        break;
-      }
       
+      if(rcImgs.length === 0) {
+        console.log('Right - no elem');
+        return;
+      } else if(rcImgs.length === 1) {
+        rcImgFirst = rcImgs[0];
+      } else {
+        for(var i in rcImgs) {
+          rcImgFirst = rcImgs[i];
+          break;
+        }
+      }
+      rcImgFirst.style.opacity = 0.4;
       leftContainer[0].appendChild(rcImgFirst);
-      var lcWidth = leftContainer[0].clientWidth;
-      //console.log(lcWidth);
+
       lcWidth += 100;
-      //console.log(lcWidth);
-      leftContainer.css('width', lcWidth);
+      leftContainer.css('width', lcWidth + 'px');
+      
+      if(rcWidth !== 0) {
+        rcWidth -= 100;
+        rightContainer.css('width', rcWidth + 'px');
+      }
       
       var rcImgs = rightContainer.find('img');
       var rcImgFirst = null;
       
-      for(var i in rcImgs) {
-        rcImgFirst = rcImgs[i];
-        //rcImgs[i].style = 'opacity: 0.4;';  // does not work
-        //rcImgFirst[i].style.opacity = 0.4;
-        rcImgs[i].remove();
-        break;
-      }  
-      
+      if(rcImgs.length === 0) {
+        console.log('Right - no elem');
+        return;
+      } else if(rcImgs.length === 1) {
+        rcImgFirst = rcImgs[0];
+      } else {
+        for(var i in rcImgs) {
+          rcImgFirst = rcImgs[i];
+          break;
+        }  
+      }
+      rcImgFirst.style.opacity = 1;
       resizableContainer[0].appendChild(rcImgFirst);
-        
     };
 
   });
