@@ -1,0 +1,8 @@
+{
+  "name": "videoClipper",
+  "version": "0.0.1",
+  "devDependencies": {
+    "gulp": "*",
+    "browser-sync": "^1.8.1"
+  }
+}
