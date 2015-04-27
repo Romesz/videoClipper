@@ -13,6 +13,7 @@
     var mainVideo = document.getElementById('mainVideo');
     var fakeVideo = document.getElementById('fakeVideo');
     fakeVideo.muted = true;
+    fakeVideo.playbackRate = 3.0;
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
@@ -44,28 +45,23 @@
         createImgTags(counter, e.target.currentTime);
         counter++;
         
-      }, 100);
+      }, 300);
     }, false);
     
-    mainVideo.addEventListener('play', function(e) {
-      mainVideo.currentTime = fakeVideo.currentTime;
-    }, false);
-    
-    //ng-mousemove="sliderGrab($event)"
     /*
-    $scope.sliderGrab = function(e) {
-      e.preventDefault();
-      console.log(e.pageX);
-      
-      var imageSilder = angular.element(document.querySelector('#imageSilder'));
-      imageSilder.scrollTo(500, 0);
-    }; 
+    mainVideo.addEventListener('play', function(e) {
+      //mainVideo.currentTime = fakeVideo.currentTime;
+      // get the value of the silder;
+    }, false); 
     */
+    
+    mainVideo.addEventListener('seeking', function(e) {
+      // set the value of the silder;
+    }, false);
     
     var lcWidth = 0;
     var rcWidth = 200;
     
-    //$scope.left = function() {
     function goLeft() {
       var lcImgs = leftContainer.find('img');
       var lcImglast = null;
@@ -106,7 +102,6 @@
       rightContainer[0].insertBefore(rcImglast, rightContainer[0].firstChild);
     };
     
-    //$scope.right = function() { 
     function goRight() {
       var rescImgs = resizableContainer.find('img');
       var rescImgFirst = null;
@@ -168,6 +163,8 @@
     $scope.sliderMouseDown = function(e) {
       e.preventDefault();
       mouseBeforeX = true;
+      
+      mainVideo.pause();
     };
     
     $scope.sliderMouseUp = function(e) {
@@ -178,18 +175,10 @@
     $scope.sliderMove = function(e) {
       e.preventDefault();
 
-
       if(mouseBeforeX === null)
         return;
       
       var x = event.clientX;
-      
-      /*
-      console.log('x');
-      console.log(x);
-      console.log('mouseBeforeX');
-      console.log(mouseBeforeX);
-      */
       
       if(x < mouseBeforeX) {
         goRight();
@@ -197,6 +186,12 @@
         goLeft();
       }
       mouseBeforeX = x;
+      
+      
+      var getCurrentImgTime = resizableContainer.find('img').attr('data-ctime');
+      mainVideo.currentTime = getCurrentImgTime;
+      
+      mainVideo.play();
     };
 
   
@@ -223,7 +218,7 @@
         saveImgToArray(context, fakeVideo, canvas);
         createImgTags(counter, fakeVideo.currentTime);
         counter++;            
-      }, 100);
+      }, 300);
     }
 
     function saveImgToArray(context, video, thecanvas) {
@@ -244,15 +239,17 @@
         var imgTag = document.createElement('IMG');
         imgTag.src = imgArr[counter];
         imgTag.id = 'img' + counter;
-        imgTag['data-ctime'] = cTime;
-        imgTag['ng-click'] = 'imgClick()';
+        imgTag.dataset.ctime = cTime;
+        //imgTag['data-ctime'] = cTime;
+        //imgTag['ng-click'] = 'imgClick()';
       
-        if(counter < 3)
+        if(counter < 3) {
           leftContainer[0].appendChild(imgTag);
-        else if(counter < 11)
+        } else if(counter < 11) {
           resizableContainer[0].appendChild(imgTag);
-        else
+        } else {
           rightContainer[0].appendChild(imgTag);
+        }
     };
     //direttiva
     
@@ -267,7 +264,7 @@
       }
       
       if(imgLast !== null) {
-        $('#leftContainer').scrollTop($('#' + imgLast.id).offset().top)
+        $('#leftContainer').scrollTop($('#' + imgLast.id).offset().top);
       }
     }
 
