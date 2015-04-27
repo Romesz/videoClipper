@@ -1,6 +1,5 @@
+// http://coub.com/sources/1315039
 // http://stackoverflow.com/questions/5845484/force-html5-youtube-video
-// http://html5doctor.com/video-canvas-magic/
-// https://github.com/darul75/ng-slider
 
 (function () {
   var app = angular.module('videoClipper', []);
@@ -13,6 +12,7 @@
     var leftContainer = angular.element(document.querySelector('#leftContainer'));
     var mainVideo = document.getElementById('mainVideo');
     var fakeVideo = document.getElementById('fakeVideo');
+    fakeVideo.muted = true;
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
@@ -24,7 +24,7 @@
     var interval = null;
     
     var isWidth = imageSilder[0].clientWidth;
-    var rescWidth = resizableContainer[0].clientWidth / 100;
+    var rescWidth = Math.round(resizableContainer[0].clientWidth / 100);
 
     var img = null;
     
@@ -32,70 +32,20 @@
     fakeVideo.addEventListener('play', function(e) {
       
       interval = setInterval(function() {
-        if(imgArr.length >= 10) {
+        if(imgArr.length >= 14) {
           fakeVideo.pause();
           clearInterval(interval);
-          
-          img = angular.element(document.querySelectorAll('img'));
-          img.css('opacity', '0.4');
-          
-          var imgCounter = 0;
-          
-          for(var index in img) {
-            if(imgCounter === rescWidth)
-              return;
-            
-            img[index].style.opacity = 1;
-            imgCounter++;
-          }
+          interval = null;
           
           // other images need to be generated
-          
-          /*
-          interval = setInterval(function() {
-            if(fakeVideo.currentTime < fakeVideo.duration) {
-              fakeVideo.pause();
-              clearInterval(interval);
-            }
-            
-            fakeVideo.play();
-            
-            saveImgToArray(fakeVideo, canvas);
-            createImgTags(counter, e.target.currentTime);
-            counter++;            
-          }, 100);
-          */
         }
         
-        saveImgToArray(fakeVideo, canvas);
+        saveImgToArray(context, fakeVideo, canvas);
         createImgTags(counter, e.target.currentTime);
         counter++;
         
       }, 100);
     }, false);
-    
-    
-    function saveImgToArray(video, thecanvas) {
-      context.drawImage( video, 0, 0, thecanvas.width, thecanvas.height);
-      var dataURL = thecanvas.toDataURL();
-      imgArr.push(dataURL);
-    };
-
-    function createImgTags(counter, cTime) {
-      var imgContainer = document.getElementById('resizableContainer');
-      var rightContainer = document.getElementById('rightContainer');
-      
-      var imgTag = document.createElement('IMG');
-      imgTag.src = imgArr[counter];
-      imgTag.id = 'img' + counter;
-      imgTag['data-ctime'] = cTime;
-      imgTag['ng-click'] = 'imgClick()';
-      if(counter < 8)
-        imgContainer.appendChild(imgTag);
-      else
-        rightContainer.appendChild(imgTag);
-    };
-    //direttiva
     
     mainVideo.addEventListener('play', function(e) {
       mainVideo.currentTime = fakeVideo.currentTime;
@@ -115,15 +65,14 @@
     var lcWidth = 0;
     var rcWidth = 200;
     
-    $scope.left = function() {
+    //$scope.left = function() {
+    function goLeft() {
       var lcImgs = leftContainer.find('img');
       var lcImglast = null;
       
-      if(lcImgs.length === 0) {
+      if(lcImgs.length === 3) {
         console.log('LEFT - no elem');
         return;
-      } else if(lcImgs.length === 1) {
-        lcImglast = lcImgs[0];
       } else {
       
         for(var i = lcImgs.length; i > 0  ; i--) {
@@ -131,14 +80,12 @@
           break;
         }
       }
-      lcImglast.style.opacity = 1;
       resizableContainer[0].insertBefore(lcImglast, resizableContainer[0].firstChild);
       
       if(lcWidth !== 0) {
         lcWidth -= 100;
         leftContainer.css('width', lcWidth + 'px');  
       }
-
       
       var rescLen = resizableContainer.find('img').length;
       if(rescLen <= 8) {
@@ -151,42 +98,38 @@
       var rcImgs = resizableContainer.find('img');
       var rcImglast = null;
 
-      if(rcImgs.length === 0) {
-        console.log('LEFT - no elem');
-        return;
-      } else if(rcImgs.length === 1) {
-        rcImglast = rcImgs[0];
-      } else {
 
-        for(var i = rcImgs.length; i > 0  ; i--) {
-          rcImglast = rcImgs[i - 1];
-          break;
-        }
+      for(var i = rcImgs.length; i > 0  ; i--) {
+        rcImglast = rcImgs[i - 1];
+        break;
       }
-      rcImglast.style.opacity = 0.4;
       rightContainer[0].insertBefore(rcImglast, rightContainer[0].firstChild);
-      
-      // here is the problem
     };
     
-    $scope.right = function() {      
-      var rcImgs = resizableContainer.find('img');
-      var rcImgFirst = null;
+    //$scope.right = function() { 
+    function goRight() {
+      var rescImgs = resizableContainer.find('img');
+      var rescImgFirst = null;
       
-      
-      if(rcImgs.length === 0) {
-        console.log('Right - no elem');
+      /*
+      if(rescImgs.length === 0) {
+        console.log('res - no elem');
         return;
-      } else if(rcImgs.length === 1) {
-        rcImgFirst = rcImgs[0];
       } else {
-        for(var i in rcImgs) {
-          rcImgFirst = rcImgs[i];
+      */
+        for(var i in rescImgs) {
+          rescImgFirst = rescImgs[i];
           break;
         }
+      //}
+      try{
+      leftContainer[0].appendChild(rescImgFirst);
+
+      } catch(e) {
+        console.log(e);
       }
-      rcImgFirst.style.opacity = 0.4;
-      leftContainer[0].appendChild(rcImgFirst);
+      
+      scrollToImg();
 
       lcWidth += 100;
       leftContainer.css('width', lcWidth + 'px');
@@ -199,28 +142,144 @@
       var rcImgs = rightContainer.find('img');
       var rcImgFirst = null;
       
-      if(rcImgs.length === 0) {
+      /*
+      if(rcImgs.length === 3) {
         console.log('Right - no elem');
         return;
-      } else if(rcImgs.length === 1) {
-        rcImgFirst = rcImgs[0];
       } else {
+      */
         for(var i in rcImgs) {
           rcImgFirst = rcImgs[i];
           break;
         }  
-      }
-      rcImgFirst.style.opacity = 1;
+      //}
+      try {
       resizableContainer[0].appendChild(rcImgFirst);
+      } catch(e) {
+        console.log(e);
+      }
+      
+      
+      generateImgs();
     };
+    
+    var mouseBeforeX = null;
+    
+    $scope.sliderMouseDown = function(e) {
+      e.preventDefault();
+      mouseBeforeX = true;
+    };
+    
+    $scope.sliderMouseUp = function(e) {
+      e.preventDefault();
+      mouseBeforeX = null;
+    };
+    
+    $scope.sliderMove = function(e) {
+      e.preventDefault();
+
+
+      if(mouseBeforeX === null)
+        return;
+      
+      var x = event.clientX;
+      
+      /*
+      console.log('x');
+      console.log(x);
+      console.log('mouseBeforeX');
+      console.log(mouseBeforeX);
+      */
+      
+      if(x < mouseBeforeX) {
+        goRight();
+      } else {
+        goLeft();
+      }
+      mouseBeforeX = x;
+    };
+
+  
+  
+    // utils fns
+    function generateImgs() {
+      //console.log('interval');
+      //console.log(interval);
+      interval = setInterval(function() {
+        if(fakeVideo.currentTime >= fakeVideo.duration) {
+        //if(imgArr.length >= 20) {
+          fakeVideo.pause();
+          clearInterval(interval);
+          interval = null;
+          
+          //console.log(fakeVideo.currentTime);
+          //console.log('generation end');
+          
+          return;
+        }
+
+        fakeVideo.play();
+
+        saveImgToArray(context, fakeVideo, canvas);
+        createImgTags(counter, fakeVideo.currentTime);
+        counter++;            
+      }, 100);
+    }
+
+    function saveImgToArray(context, video, thecanvas) {
+        context.drawImage(video, 0, 0, thecanvas.width, thecanvas.height);
+
+        try {
+          var dataURL = thecanvas.toDataURL()
+          //.setAttribute('crossOrigin', 'anonymous');
+          // http://stackoverflow.com/questions/20424279/canvas-todataurl-securityerror
+        } catch(e) {
+          console.log(e);
+        }
+
+        imgArr.push(dataURL);
+    };
+
+    function createImgTags(counter, cTime) {
+        var imgTag = document.createElement('IMG');
+        imgTag.src = imgArr[counter];
+        imgTag.id = 'img' + counter;
+        imgTag['data-ctime'] = cTime;
+        imgTag['ng-click'] = 'imgClick()';
+      
+        if(counter < 3)
+          leftContainer[0].appendChild(imgTag);
+        else if(counter < 11)
+          resizableContainer[0].appendChild(imgTag);
+        else
+          rightContainer[0].appendChild(imgTag);
+    };
+    //direttiva
+    
+    function scrollToImg() {
+      var imgs = leftContainer.find('img');
+      var imgsLen = imgs.length; 
+      var imgLast = null;
+      
+      for(var i = imgsLen; i > 0  ; i--) {
+        imgLast = imgs[i - 1];
+        break;
+      }
+      
+      if(imgLast !== null) {
+        $('#leftContainer').scrollTop($('#' + imgLast.id).offset().top)
+      }
+    }
 
   });
   
+  /*
+  scroll-on-click
   app.directive('scrollOnClick', function() {
     return {
       restrict: 'A',
       link: function(scope, $elm) {
-        /*
+        
         $elm.on('mousemove', function(e) {
           e.preventDefault();
           var x = e.pageX;
@@ -230,9 +289,9 @@
           else
             $('#img0').show();
         });
-        */
       }
     }
   });
+  */
   
 })();
