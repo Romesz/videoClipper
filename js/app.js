@@ -11,9 +11,11 @@
     var rightContainer = angular.element(document.querySelector('#rightContainer'));
     var leftContainer = angular.element(document.querySelector('#leftContainer'));
     var mainVideo = document.getElementById('mainVideo');
+    mainVideo.muted = true; //temporary
+    //mainVideo.playbackRate = 10.0; //temporary
     var fakeVideo = document.getElementById('fakeVideo');
     fakeVideo.muted = true;
-    fakeVideo.playbackRate = 3.0;
+    fakeVideo.playbackRate = 4.0;
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
@@ -33,7 +35,7 @@
     fakeVideo.addEventListener('play', function(e) {
       
       interval = setInterval(function() {
-        if(imgArr.length >= 14) {
+        if(imgArr.length >= 30) {
           fakeVideo.pause();
           clearInterval(interval);
           interval = null;
@@ -45,7 +47,7 @@
         createImgTags(counter, e.target.currentTime);
         counter++;
         
-      }, 300);
+      }, 150);
     }, false);
     
     /*
@@ -58,6 +60,8 @@
     mainVideo.addEventListener('seeking', function(e) {
       // set the value of the silder;
     }, false);
+    
+    getRisContainerFrames();
     
     var lcWidth = 0;
     var rcWidth = 200;
@@ -218,7 +222,7 @@
         saveImgToArray(context, fakeVideo, canvas);
         createImgTags(counter, fakeVideo.currentTime);
         counter++;            
-      }, 300);
+      }, 150);
     }
 
     function saveImgToArray(context, video, thecanvas) {
@@ -267,6 +271,12 @@
         $('#leftContainer').scrollTop($('#' + imgLast.id).offset().top);
       }
     }
+    
+    function getRisContainerFrames() {
+      // get the first and last of the resContiner
+      // set the currentTime and duratiion
+      // loop
+    };
 
   });
   

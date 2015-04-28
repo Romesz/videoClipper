@@ -1,3 +1,6 @@
+html, body {
+  padding: 0;
+}
 canvas {
   display: none;
 }
@@ -17,8 +20,8 @@ canvas {
     display: inline-block;
     /*border: 1px solid red;*/
     height: 90px;
-    min-width: 20%;
-    max-width: 20%;
+    min-width: 100px;
+    max-width: 19%;
     /*width: 100px;*/
     opacity: 0.5;
   }
@@ -28,8 +31,8 @@ canvas {
     /*border: 1px solid red;*/
     height: 90px;
     width: 200px;
-    min-width: 20%;
-    max-width: 20%;
+    min-width: 100px;
+    max-width: 19%;
     opacity: 0.5;
   }
   #resizableContainer {
@@ -40,6 +43,9 @@ canvas {
     /*width: 800px;*/
     width: 805px;
     z-index: 99;
+    
+    max-width: 60%;
+    overflow: hidden;
   }
     #left, #right {
       background: #fff;
