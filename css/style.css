@@ -1,73 +1,64 @@
 html, body {
   padding: 0;
 }
-canvas {
-  display: none;
-}
-#fakeVideo {
-  display: none;
-}
-#imageSilder {
-  height: 100px;
-  width: 100%;
-  
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none; 
-}
-  #leftContainer {
-    overflow: hidden;
-    display: inline-block;
-    /*border: 1px solid red;*/
-    height: 90px;
-    min-width: 100px;
-    max-width: 19%;
-    /*width: 100px;*/
-    opacity: 0.5;
+  #fakeVideo, canvas {
+    display: none;
   }
-  #rightContainer {
-    overflow: hidden;
-    display: inline-block;
-    /*border: 1px solid red;*/
-    height: 90px;
-    width: 200px;
-    min-width: 100px;
-    max-width: 19%;
-    opacity: 0.5;
-  }
-  #resizableContainer {
-    display: inline-block;
-    border: 5px solid blue;
-    border-radius: 5px;
+  #imageSilder {
     height: 100px;
-    /*width: 800px;*/
-    width: 805px;
-    z-index: 99;
-    
-    max-width: 60%;
-    overflow: hidden;
+    width: 100%;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none; 
   }
-    #left, #right {
-      background: #fff;
-      color: #000;
-      height: 20px;
-      width: 30px;
-    }
-    #left {
-      position: absolute;
-      left: 0;
-    }
-    #right {
-      position: absolute;
-      right: 0;
-    }
-    img {
+    #leftContainer {
+      overflow: hidden;
       display: inline-block;
-      height: 100px;
-      width: 100px;
-      /*
-      padding-right: 10px;
-      padding-top: 10px;
-      padding-left: 10px;
-      */
+      /*border: 1px solid red;*/
+      height: 90px;
+      min-width: 100px;
+      max-width: 19%;
+      /*width: 100px;*/
+      opacity: 0.5;
     }
+    #rightContainer {
+      overflow: hidden;
+      display: inline-block;
+      /*border: 1px solid red;*/
+      height: 90px;
+      width: 200px;
+      min-width: 100px;
+      max-width: 19%;
+      opacity: 0.5;
+    }
+    #resizableContainer {
+      display: inline-block;
+      border: 5px solid blue;
+      border-radius: 5px;
+      height: 100px;
+      width: 805px;
+      z-index: 99;
+
+      max-width: 60%;
+      overflow: hidden;
+    }
+      #left, #right {
+        background: #fff;
+        color: #000;
+        height: 20px;
+        width: 30px;
+      }
+      #left {
+        position: absolute;
+        left: 0;
+      }
+      #right {
+        position: absolute;
+        right: 0;
+      }
+      img {
+        display: inline-block;
+        height: 100px;
+        width: 100px;
+      }
