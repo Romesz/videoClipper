@@ -24,12 +24,21 @@ app.directive('fakeVideo', function($interval) {
   return {
     restrict: 'A',
     link: function($scope, fakeVideo) {
+      
       fakeVideo.muted = true;
       fakeVideo.playbackRate = 4.0;
+      /*
+      console.log($scope)
       
-      fakeVideo.on('play', function(e) {
+      $scope.initVideo = function() {
+      
+        console.log('init');
+      };
+      
         
-        $scope.interval = $interval(function() {
+      fakeVideo.on('play', function(e) {
+
+        //$scope.interval = $interval(function() {
           if($scope.imgArr.length === 12) {
             $scope.getRisContainerFrames();
           }
@@ -39,18 +48,23 @@ app.directive('fakeVideo', function($interval) {
             $interval.cancel($scope.interval);
             $scope.interval = null;
           }
-         
-          $scope.fakeVideo[0].onload = function() {
-            $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
+
+
+
+          //fakeVideo[0].onload = function() {
+
+
+              var canvas = document.getElementById('canvas');
+              var context = canvas.getContext('2d');
+
+            $scope.saveImgToArray(context, fakeVideo, canvas);
+            //$scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
             $scope.createImgTags($scope.counter, e.target.currentTime);
             $scope.counter++;
-            
-            console.log('asdads');
-          }
 
-        }, 150);
+        //}, 150000);
       });
-      
+      */
       $scope.fakeVideo = fakeVideo;
       
     }

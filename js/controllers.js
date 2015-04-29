@@ -1,6 +1,12 @@
 // http://stackoverflow.com/questions/15165991/uncaught-typeerror-type-error-with-drawimage
+(function () {
 app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval) {
-
+ 
+  var fakeVideo = document.getElementById('fakeVideo');
+  fakeVideo.muted = true;
+  fakeVideo.playbackRate = 4.0;
+  fakeVideo.loop = false;
+  
   var imageSilder = angular.element(document.querySelector('#imageSilder'));
   var resizableContainer = angular.element(document.querySelector('#resizableContainer'));
   var rightContainer = angular.element(document.querySelector('#rightContainer'));
@@ -11,64 +17,87 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   
   $scope.imgArr  = new Array();
   $scope.counter = 0;
-  $scope.interval = null;
+  var intervalFirstPhase = null;
+  var intervalSecondPhase = null;
 
   var isWidth = imageSilder[0].clientWidth;
   var rescWidth = Math.round(resizableContainer[0].clientWidth / 100);
-
-  var lcWidth = 0;
-  var rcWidth = 200;
-
-  $scope.generateImgs = function() {
-    $scope.interval = $interval(function() {
-      if($scope.fakeVideo[0].currentTime >= $scope.fakeVideo[0].duration) {
-      //if($scope.imgArr.length >= 20) {
-        $scope.fakeVideo[0].pause();
-        $interval.cancel($scope.interval);
-        interval = null;
-
-        //console.log($scope.fakeVideo[0].currentTime);
-        //console.log('generation end');
-
-        return;
+ 
+  fakeVideo.addEventListener('play', function(e) {
+    intervalFirstPhase = $interval(function() {
+      if(intervalFirstPhase == null) return;
+     
+      $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
+      $scope.createImgTags($scope.counter, e.target.currentTime);
+      $scope.counter++;
+     
+      if($scope.imgArr.length === 12) {
+        console.log('12');
+        $scope.getRisContainerFrames();
+      } else if($scope.imgArr.length === 18) {
+        console.log('18');
+        fakeVideo.pause();
+        $interval.cancel(intervalFirstPhase);
+        $scope.$on('$destroy', function () { $interval.cancel(intervalFirstPhase); });
+        intervalFirstPhase = null;
+       
+        console.log('generation end');
       }
 
-      $scope.fakeVideo[0].play();
+    }, 150);
+   
+  }, false);
+  // this does not work in the angular way... fakeVideo.on('play', function(e) {
+  // I got an error about the canvas context drawImage does not defined.
+ 
+  $scope.generateImgs = function() {
+   
+   var imgCtime = parseInt($scope.clickedImgCtime) + 70;
+   console.log('imgCtime: ' + imgCtime);
+   
+   intervalSecondPhase = $interval(function() {
+     
+     if(intervalSecondPhase == null) return;
+    
+     console.log('fakeVideo.currentTime: ' + fakeVideo.currentTime);
+    
+     if(imgCtime < fakeVideo.currentTime || parseInt(fakeVideo.currentTime) == 0) {
+      
+       fakeVideo.pause();
+       $interval.cancel(intervalSecondPhase);
+       $scope.$on('$destroy', function () { $interval.cancel(intervalSecondPhase); });
+       intervalSecondPhase = null;
 
-      $scope.saveImgToArray($scope.context, $scope.fakeVideo, $scope.canvas);
-      $scope.createImgTags($scope.counter, $scope.fakeVideo[0].currentTime);
-      $scope.counter++;            
-    }, 150);      
-  }
+       console.log('generation end');
+     } else {
+      
+       console.log('add ' + fakeVideo.currentTime);
+       fakeVideo.play();
+
+       $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
+       $scope.createImgTags($scope.counter, fakeVideo.currentTime);
+       $scope.counter++;  
+     }
+   }, 150);
+  };
   
   function goLeft() {
     var lcImgs = leftContainer.find('img');
     var lcImglast = null;
-
+    
+    
     if(lcImgs.length === 3) {
       console.log('LEFT - no elem');
       return;
-    } else {
-
-      for(var i = lcImgs.length; i > 0  ; i--) {
-        lcImglast = lcImgs[i - 1];
-        break;
-      }
     }
+   
+    for(var i = lcImgs.length; i > 0  ; i--) {
+      lcImglast = lcImgs[i - 1];
+      break;
+    }
+   
     resizableContainer[0].insertBefore(lcImglast, resizableContainer[0].firstChild);
 
-    if(lcWidth !== 0) {
-      lcWidth -= 100;
-      leftContainer.css('width', lcWidth + 'px');  
-    }
-
-    var rescLen = resizableContainer.find('img').length;
-    if(rescLen <= 8) {
-      return;
-    }
-
-    rcWidth += 100;
-    rightContainer.css('width', rcWidth + 'px');
 
     var rcImgs = resizableContainer.find('img');
     var rcImglast = null;
@@ -85,17 +114,11 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     var rescImgs = resizableContainer.find('img');
     var rescImgFirst = null;
 
-    /*
-    if(rescImgs.length === 0) {
-      console.log('res - no elem');
-      return;
-    } else {
-    */
-      for(var i in rescImgs) {
-        rescImgFirst = rescImgs[i];
-        break;
-      }
-    //}
+    for(var i in rescImgs) {
+      rescImgFirst = rescImgs[i];
+      break;
+    }
+   
     try {
       leftContainer[0].appendChild(rescImgFirst);
 
@@ -105,37 +128,19 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
 
     $scope.scrollToImg();
 
-    lcWidth += 100;
-    leftContainer.css('width', lcWidth + 'px');
-
-    if(rcWidth !== 0) {
-      rcWidth -= 100;
-      rightContainer.css('width', rcWidth + 'px');
-    }
-
     var rcImgs = rightContainer.find('img');
     var rcImgFirst = null;
-
-    /*
-    if(rcImgs.length === 3) {
-      console.log('Right - no elem');
-      return;
-    } else {
-    */
-      for(var i in rcImgs) {
-        rcImgFirst = rcImgs[i];
-        break;
-      }  
-    //}
+   
+    for(var i in rcImgs) {
+      rcImgFirst = rcImgs[i];
+      break;
+    }
+   
     try {
       resizableContainer[0].appendChild(rcImgFirst);
     } catch(e) {
       console.log(e);
     }
-
-
-    //utils.generateImgs();
-    $scope.generateImgs();
   };
 
   var mouseBeforeX = null;
@@ -143,6 +148,13 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   $scope.sliderMouseDown = function(e) {
     e.preventDefault();
     mouseBeforeX = true;
+   
+    var rcImgs = rightContainer.find('img');
+    var rcImgsLen = rcImgs.length;
+    var rcImgCtime = rcImgs[rcImgsLen - 1].dataset.ctime;
+    $scope.clickedImgCtime = rcImgCtime;
+   
+    $scope.generateImgs();
 
     $scope.mainVideo[0].pause();
   };
@@ -161,6 +173,11 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     var x = event.clientX;
 
     if(x < mouseBeforeX) {
+      if(rightContainer.find('img').length < 4) {
+       console.log('RIGHT - no elem');
+       return;
+      }
+     
       goRight();
     } else {
       goLeft();
@@ -171,17 +188,15 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     var getCurrentImgTime = resizableContainer.find('img').attr('data-ctime');
     $scope.mainVideo.currentTime = getCurrentImgTime;
 
-    //$scope.mainVideo.play();
+    $scope.hidePictures();
     $scope.getRisContainerFrames();
+    $scope.mainVideo[0].play();
   };
 
   
   $scope.saveImgToArray = function(context, video, thecanvas) {
-    //$scope.fakeVideo[0].onload = function() {
-      context.drawImage(video, 0, 0, thecanvas.width, thecanvas.height);
-    //}
-
     try {
+      context.drawImage(video, 0, 0, thecanvas.width, thecanvas.height);
       var dataURL = thecanvas.toDataURL();
       //.setAttribute('crossOrigin', 'anonymous');
       // http://stackoverflow.com/questions/20424279/canvas-todataurl-securityerror
@@ -189,10 +204,12 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       console.log(e);
     }
     $scope.imgArr.push(dataURL);
-    //$scope.imgArr.push(null);
   };
   
   $scope.createImgTags = function(counter, cTime) {
+      if(cTime === 0)
+         return;
+   
       var imgTag = document.createElement('IMG');
       imgTag.src = $scope.imgArr[counter];
       imgTag.id = 'img' + $scope.counter;
@@ -222,6 +239,26 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     }
   };
   
+  $scope.hidePictures = function() {
+    var leftImgs = leftContainer.find('img');
+    var leftImgsLen = leftContainer.find('img').length;
+    if(leftImgsLen > 3) {
+      leftImgs.css('display', 'none');
+      leftImgs[leftImgsLen - 1].style.display = 'inline-block';
+      leftImgs[leftImgsLen - 2].style.display = 'inline-block';
+      leftImgs[leftImgsLen - 3].style.display = 'inline-block';
+    }    
+   
+    var rightImgs = rightContainer.find('img');
+    var rightImgsLen = rightContainer.find('img').length;
+    if(rightImgsLen > 3) {
+      rightImgs.css('display', 'none');
+      rightImgs[0].style.display = 'inline-block';
+      rightImgs[1].style.display = 'inline-block';
+      rightImgs[2].style.display = 'inline-block';
+    }
+  };
+ 
   $scope.getRisContainerFrames = function() {
 
     var getResCImgs = resizableContainer.find('img');
@@ -236,15 +273,19 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
 
     var getResCImgLast = getResCImgLast.dataset.ctime;
 
-    $scope.mainVideo.currentTime = getResCImgFirst;
-    $scope.mainVideo.duration = getResCImgLast;
-    $scope.mainVideo.loop = true;
+    $scope.mainVideo[0].currentTime = getResCImgFirst;
+    $scope.mainVideo[0].duration = getResCImgLast;
+    $scope.mainVideo[0].loop = true;
 
-    console.log('%c currentTime -- ' + $scope.mainVideo.currentTime, 'border: 1px solid green;');
-    console.log('%c duration -- ' + $scope.mainVideo.duration, 'border: 1px solid green;');
+    /*
+    console.log('%c currentTime -- ' + $scope.mainVideo[0].currentTime, 'border: 1px solid green;');
+    console.log('%c duration -- ' + $scope.mainVideo[0].duration, 'border: 1px solid green;');
     console.log('%c duration should be -- ' + getResCImgLast, 'border: 1px solid green;');
+    */
 
     //perhaps need another video tag vith these info
   };
 
-}]);
+}]); 
+ 
+})();
