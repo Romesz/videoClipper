@@ -6,11 +6,11 @@ app.directive('mainVideo', function() {
       mainVideo.muted = true; //temporary
       
       mainVideo.on('play', function(e) {
-        //mainVideo.currentTime = fakeVideo.currentTime;
-        // get the value of the silder;
+        
       });
       mainVideo.on('seeking', function(e) {
-        //
+        // get current time
+        // look for the img 
       });
       
       $scope.mainVideo = mainVideo;
@@ -24,10 +24,10 @@ app.directive('fakeVideo', function($interval) {
   return {
     restrict: 'A',
     link: function($scope, fakeVideo) {
-      
+      /*
       fakeVideo.muted = true;
       fakeVideo.playbackRate = 4.0;
-      /*
+      
       console.log($scope)
       
       $scope.initVideo = function() {
