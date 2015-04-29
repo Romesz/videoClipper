@@ -285,7 +285,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
 
     //perhaps need another video tag vith these info
    
-    $scope.addShortVideo(getResCImgFirst, getResCImgLast);
+    //$scope.addShortVideo(getResCImgFirst, getResCImgLast);
   };
  
   $scope.addShortVideo = function(currentTime, duration) {
