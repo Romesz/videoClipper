@@ -284,6 +284,20 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     */
 
     //perhaps need another video tag vith these info
+   
+    $scope.addShortVideo(getResCImgFirst, getResCImgLast);
+  };
+ 
+  $scope.addShortVideo = function(currentTime, duration) {
+    var video = document.createElement('VIDEO');
+    video.id = 'loopVideo';
+    video.src = 'lib/Forrest%20Gump%20in%20One%20Minute,%20in%20One%20Take.mp4';
+    video.currentTime = currentTime;
+    video.duration = duration;
+    video.loop = true;
+    video.controls = true;
+    
+    document.body.appendChild(video);
   };
 
 }]); 

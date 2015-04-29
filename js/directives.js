@@ -1,9 +1,20 @@
+//http://stackoverflow.com/questions/11212715/control-start-position-and-duration-of-play-in-html5-video
+
 //main-video
 app.directive('mainVideo', function() {
   return {
     restrict: 'A',
     link: function($scope, mainVideo) {
       mainVideo.muted = true; //temporary
+      
+      /*
+      mainVideo.on('loadedmetadata', function(e) {
+       videoStartTime = 7;
+       durationTime = 9;
+       this.currentTime = videoStartTime;
+       this.duration = durationTime;
+      });
+      */
       
       mainVideo.on('play', function(e) {
         
