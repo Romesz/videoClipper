@@ -7,12 +7,21 @@ app.directive('mainVideo', function() {
     link: function($scope, mainVideo) {
       mainVideo.muted = true; //temporary
       
+      //http://www.w3schools.com/tags/ref_av_dom.asp
+      //http://gingertech.net/2009/08/19/jumping-to-time-offsets-in-videos/
+     
+      /*
+      mainVideo.duration = 9;
+      mainVideo.on('durationchange', function(e) {
+       console.log('duration change ' + this.duration);
+      });
+      */
       /*
       mainVideo.on('loadedmetadata', function(e) {
-       videoStartTime = 7;
-       durationTime = 9;
-       this.currentTime = videoStartTime;
-       this.duration = durationTime;
+       this.currentTime = 7;
+       this.duration = 9;
+       console.log(this.currentTime);
+       console.log(this.duration);
       });
       */
       
@@ -25,7 +34,6 @@ app.directive('mainVideo', function() {
       });
       
       $scope.mainVideo = mainVideo;
-      
     }
   }
 });

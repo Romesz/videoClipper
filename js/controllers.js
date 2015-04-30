@@ -32,16 +32,16 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       $scope.counter++;
      
       if($scope.imgArr.length === 12) {
-        console.log('12');
+        //console.log('12');
         $scope.getRisContainerFrames();
       } else if($scope.imgArr.length === 18) {
-        console.log('18');
+        //console.log('18');
         fakeVideo.pause();
         $interval.cancel(intervalFirstPhase);
         $scope.$on('$destroy', function () { $interval.cancel(intervalFirstPhase); });
         intervalFirstPhase = null;
        
-        console.log('generation end');
+        //console.log('generation end');
       }
 
     }, 150);
@@ -53,13 +53,13 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   $scope.generateImgs = function() {
    
    var imgCtime = parseInt($scope.clickedImgCtime) + 70;
-   console.log('imgCtime: ' + imgCtime);
+   //console.log('imgCtime: ' + imgCtime);
    
    intervalSecondPhase = $interval(function() {
      
      if(intervalSecondPhase == null) return;
     
-     console.log('fakeVideo.currentTime: ' + fakeVideo.currentTime);
+     //console.log('fakeVideo.currentTime: ' + fakeVideo.currentTime);
     
      if(imgCtime < fakeVideo.currentTime || parseInt(fakeVideo.currentTime) == 0) {
       
@@ -68,10 +68,10 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
        $scope.$on('$destroy', function () { $interval.cancel(intervalSecondPhase); });
        intervalSecondPhase = null;
 
-       console.log('generation end');
+       //console.log('generation end');
      } else {
       
-       console.log('add ' + fakeVideo.currentTime);
+       //console.log('add ' + fakeVideo.currentTime);
        fakeVideo.play();
 
        $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
@@ -185,8 +185,8 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     mouseBeforeX = x;
 
 
-    var getCurrentImgTime = resizableContainer.find('img').attr('data-ctime');
-    $scope.mainVideo.currentTime = getCurrentImgTime;
+    //var getCurrentImgTime = resizableContainer.find('img').attr('data-ctime');
+    //$scope.mainVideo.currentTime = getCurrentImgTime;
 
     $scope.hidePictures();
     $scope.getRisContainerFrames();
@@ -273,9 +273,10 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
 
     var getResCImgLast = getResCImgLast.dataset.ctime;
 
-    $scope.mainVideo[0].currentTime = getResCImgFirst;
-    $scope.mainVideo[0].duration = getResCImgLast;
-    $scope.mainVideo[0].loop = true;
+   
+    //$scope.mainVideo[0].currentTime = getResCImgFirst;
+    //$scope.mainVideo[0].duration = getResCImgLast;
+    //$scope.mainVideo[0].loop = true;
 
     /*
     console.log('%c currentTime -- ' + $scope.mainVideo[0].currentTime, 'border: 1px solid green;');
@@ -285,19 +286,33 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
 
     //perhaps need another video tag vith these info
    
-    //$scope.addShortVideo(getResCImgFirst, getResCImgLast);
+    $scope.addShortVideo(getResCImgFirst, getResCImgLast);
   };
  
   $scope.addShortVideo = function(currentTime, duration) {
-    var video = document.createElement('VIDEO');
-    video.id = 'loopVideo';
-    video.src = 'lib/Forrest%20Gump%20in%20One%20Minute,%20in%20One%20Take.mp4';
-    video.currentTime = currentTime;
-    video.duration = duration;
-    video.loop = true;
-    video.controls = true;
+    var videoSrc = $scope.mainVideo.find('source')[0].src;
+    var cutBy = videoSrc.indexOf('#t=');
+    var srcCutTime = null;
+    if(cutBy > 0) {
+      srcCutTime =  videoSrc.substr(0, cutBy); 
+    }
+    if(srcCutTime === null) {
+      srcCutTime = videoSrc;
+    }
+   
+    $scope.mainVideo.find('source')[0].src = srcCutTime + '#t=' + currentTime + ',' + duration;
+   
+    $scope.mainVideo[0].load();
+   
+    console.log($scope.mainVideo.find('source')[0].src);
     
-    document.body.appendChild(video);
+    //$scope.mainVideo[0].loop = true; //out does not work
+    // loop hack
+    $scope.mainVideo.on('pause', function(e) {
+      $scope.mainVideo.find('source')[0].src = srcCutTime + '#t=' + currentTime + ',' + duration;
+      $scope.mainVideo[0].load();
+      $scope.mainVideo[0].play();
+    });
   };
 
 }]); 
