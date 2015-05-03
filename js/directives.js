@@ -6,6 +6,7 @@ app.directive('mainVideo', function() {
     restrict: 'A',
     link: function($scope, mainVideo) {
       mainVideo.muted = true; //temporary
+      mainVideo.initSrc = mainVideo.find('source')[0].src;
       
       //http://www.w3schools.com/tags/ref_av_dom.asp
       //http://gingertech.net/2009/08/19/jumping-to-time-offsets-in-videos/
@@ -29,11 +30,77 @@ app.directive('mainVideo', function() {
         
       });
       mainVideo.on('seeking', function(e) {
-        // get current time
-        // look for the img 
+        /*
+        console.log('seeking');
+        console.log(mainVideo.initSrc);
+        mainVideo.find('source')[0].src = mainVideo.initSrc;
+        mainVideo[0].load();
+        */
+        
+        var cTime = this.currentTime;
+        $scope.getTheImgbyTime(cTime);
       });
       
       $scope.mainVideo = mainVideo;
+      
+      
+      $scope.getTheImgbyTime = function(time) {
+        var sliderImgs = $scope.imageSilder.find('img');
+        var sliderImgsLen = sliderImgs.length;
+        var resConFirstImg = null;
+        
+        for(var i = 0 ; i < sliderImgsLen ; i++) {
+          if(parseInt(time) === parseInt(sliderImgs[i].dataset.ctime)) {
+            resConFirstImg = sliderImgs[i].dataset.ctime;
+            break;
+          }
+        }
+        
+        if(resConFirstImg !== null) {
+          $scope.aligSliderByCtimeImg(resConFirstImg);
+        }
+      };
+      
+      $scope.aligSliderByCtimeImg = function(firstImg) {
+        var sliderImgs = $scope.imageSilder.find('img');
+        var resConImgs = $scope.resizableContainer.find('img');
+        var rightConImgs = $scope.rightContainer.find('img');
+        var leftConImgs = $scope.leftContainer.find('img');
+        
+        
+        if(parseInt(resConImgs[0].dataset.ctime) === firstImg) {
+          console.log('do not have to align');
+          return;
+        }
+        
+        var sliderImgsLen = sliderImgs.length;
+        var resConCounter = 0;
+        var sliderImgsArr = [];
+        var resConImgsArr = [];
+        var leftConImgsArr = [];
+        
+        for(var i = 0 ; i < sliderImgsLen ; i++) {
+          if(parseInt(firstImg) > parseInt(sliderImgs[i].dataset.ctime)) {
+            console.log('leftCon: ' + sliderImgs[i].dataset.ctime);
+            sliderImgsArr += sliderImgs[i]; 
+            
+          } else if(parseInt(firstImg) <= parseInt(sliderImgs[i].dataset.ctime)) {
+            if(resConCounter < 8) {
+              console.log('resCon: ' + sliderImgs[i].dataset.ctime);
+              resConImgsArr += sliderImgs[i];
+              
+            } else {
+              console.log('rightCon: ' + sliderImgs[i].dataset.ctime);
+              leftConImgsArr += sliderImgs[i];
+              
+            }
+            resConCounter++;
+          } 
+        }
+        
+        console.log(sliderImgsArr)
+        
+      };
     }
   }
 });

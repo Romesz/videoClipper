@@ -1,7 +1,7 @@
 // http://stackoverflow.com/questions/15165991/uncaught-typeerror-type-error-with-drawimage
 (function () {
 app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval) {
- 
+  
   var fakeVideo = document.getElementById('fakeVideo');
   fakeVideo.muted = true;
   fakeVideo.playbackRate = 4.0;
@@ -11,6 +11,11 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   var resizableContainer = angular.element(document.querySelector('#resizableContainer'));
   var rightContainer = angular.element(document.querySelector('#rightContainer'));
   var leftContainer = angular.element(document.querySelector('#leftContainer'));
+  
+  $scope.imageSilder = imageSilder;
+  $scope.resizableContainer = resizableContainer;
+  $scope.rightContainer = rightContainer;
+  $scope.leftContainer = leftContainer;
 
   $scope.canvas = document.getElementById('canvas');
   $scope.context = $scope.canvas.getContext('2d');
@@ -67,7 +72,6 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
        $interval.cancel(intervalSecondPhase);
        $scope.$on('$destroy', function () { $interval.cancel(intervalSecondPhase); });
        intervalSecondPhase = null;
-
        //console.log('generation end');
      } else {
       
@@ -304,7 +308,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
    
     $scope.mainVideo[0].load();
    
-    console.log($scope.mainVideo.find('source')[0].src);
+    //console.log($scope.mainVideo.find('source')[0].src);
     
     //$scope.mainVideo[0].loop = true; //out does not work
     // loop hack
