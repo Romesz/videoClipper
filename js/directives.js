@@ -68,8 +68,8 @@ app.directive('mainVideo', function() {
         var leftConImgs = $scope.leftContainer.find('img');
         
         
-        if(parseInt(resConImgs[0].dataset.ctime) === firstImg) {
-          console.log('do not have to align');
+        if(parseInt(resConImgs[0].dataset.ctime) === parseInt(firstImg)) {
+          console.log('SEEKING --- do not have to align the images');
           return;
         }
         
@@ -78,27 +78,42 @@ app.directive('mainVideo', function() {
         var sliderImgsArr = [];
         var resConImgsArr = [];
         var leftConImgsArr = [];
+        var rightConImgsArr = [];
         
         for(var i = 0 ; i < sliderImgsLen ; i++) {
           if(parseInt(firstImg) > parseInt(sliderImgs[i].dataset.ctime)) {
-            console.log('leftCon: ' + sliderImgs[i].dataset.ctime);
-            sliderImgsArr += sliderImgs[i]; 
+            //console.log('leftCon: ' + sliderImgs[i].dataset.ctime);
+            leftConImgsArr.push(sliderImgs[i]); 
             
           } else if(parseInt(firstImg) <= parseInt(sliderImgs[i].dataset.ctime)) {
             if(resConCounter < 8) {
-              console.log('resCon: ' + sliderImgs[i].dataset.ctime);
-              resConImgsArr += sliderImgs[i];
+              //console.log('resCon: ' + sliderImgs[i].dataset.ctime);
+              resConImgsArr.push(sliderImgs[i]);
               
             } else {
-              console.log('rightCon: ' + sliderImgs[i].dataset.ctime);
-              leftConImgsArr += sliderImgs[i];
-              
+              //console.log('rightCon: ' + sliderImgs[i].dataset.ctime);
+              rightConImgsArr.push(sliderImgs[i]);
             }
             resConCounter++;
           } 
         }
         
-        console.log(sliderImgsArr)
+        //console.log(resConImgsArr[0])
+        
+        $scope.changeImgsBySeeker($scope.leftContainer , leftConImgsArr);
+        $scope.changeImgsBySeeker($scope.resConImgs , resConImgsArr);
+        $scope.changeImgsBySeeker($scope.rightContainer , rightConImgsArr);
+        
+      };
+      
+      $scope.changeImgsBySeeker = function(container, imgsArray) {
+        container.find('img').remove();
+        
+        var imgArrayLen = imgsArray.length;
+        
+        for(var i = 0 ; i < imgArrayLen ; i++) {
+          container[0].appendChild(imgsArray[i]);
+        }
         
       };
     }
