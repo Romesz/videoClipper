@@ -32,21 +32,23 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     intervalFirstPhase = $interval(function() {
       if(intervalFirstPhase == null) return;
      
-      $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
-      $scope.createImgTags($scope.counter, e.target.currentTime);
-      $scope.counter++;
+      //$scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
+      //$scope.createImgTags($scope.counter, e.target.currentTime);
+      //$scope.counter++;
      
       if($scope.imgArr.length === 12) {
-        //console.log('12');
         $scope.getRisContainerFrames();
       } else if($scope.imgArr.length === 18) {
         //console.log('18');
         fakeVideo.pause();
         $interval.cancel(intervalFirstPhase);
-        $scope.$on('$destroy', function () { $interval.cancel(intervalFirstPhase); });
         intervalFirstPhase = null;
        
-        //console.log('generation end');
+        console.log('FIRSTPHASE - generation end');
+      } else {
+        $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
+        $scope.createImgTags($scope.counter, e.target.currentTime);
+        $scope.counter++;
       }
 
     }, 150);
@@ -70,7 +72,6 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       
        fakeVideo.pause();
        $interval.cancel(intervalSecondPhase);
-       $scope.$on('$destroy', function () { $interval.cancel(intervalSecondPhase); });
        intervalSecondPhase = null;
        //console.log('generation end');
      } else {
@@ -90,7 +91,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     var lcImglast = null;
     
     
-    if(lcImgs.length === 3) {
+    if(lcImgs.length <= 0) {
       console.log('LEFT - no elem');
       return;
     }
@@ -159,6 +160,9 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     $scope.clickedImgCtime = rcImgCtime;
    
     $scope.generateImgs();
+    // if I slide it works
+    // If I left the animation without slide ... nope
+   
 
     $scope.mainVideo[0].pause();
   };
@@ -194,7 +198,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
 
     $scope.hidePictures();
     $scope.getRisContainerFrames();
-    $scope.mainVideo[0].play();
+    //$scope.mainVideo[0].play();
   };
 
   
@@ -246,7 +250,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   $scope.hidePictures = function() {
     var leftImgs = leftContainer.find('img');
     var leftImgsLen = leftContainer.find('img').length;
-    if(leftImgsLen > 3) {
+    if(leftImgsLen >= 3) {
       leftImgs.css('display', 'none');
       leftImgs[leftImgsLen - 1].style.display = 'inline-block';
       leftImgs[leftImgsLen - 2].style.display = 'inline-block';
@@ -255,7 +259,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
    
     var rightImgs = rightContainer.find('img');
     var rightImgsLen = rightContainer.find('img').length;
-    if(rightImgsLen > 3) {
+    if(rightImgsLen >= 3) {
       rightImgs.css('display', 'none');
       rightImgs[0].style.display = 'inline-block';
       rightImgs[1].style.display = 'inline-block';
@@ -270,25 +274,14 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     var getResCImgFirst = getResCImgs[0].dataset.ctime;
     var getResCImgLast = null;
 
+    getResCImgs.css('display', 'inline-block');
+   
     for(var i = getResCImgsLen; i > 0  ; i--) {
       getResCImgLast = getResCImgs[i - 1];
       break;
     }
 
     var getResCImgLast = getResCImgLast.dataset.ctime;
-
-   
-    //$scope.mainVideo[0].currentTime = getResCImgFirst;
-    //$scope.mainVideo[0].duration = getResCImgLast;
-    //$scope.mainVideo[0].loop = true;
-
-    /*
-    console.log('%c currentTime -- ' + $scope.mainVideo[0].currentTime, 'border: 1px solid green;');
-    console.log('%c duration -- ' + $scope.mainVideo[0].duration, 'border: 1px solid green;');
-    console.log('%c duration should be -- ' + getResCImgLast, 'border: 1px solid green;');
-    */
-
-    //perhaps need another video tag vith these info
    
     $scope.addShortVideo(getResCImgFirst, getResCImgLast);
   };
