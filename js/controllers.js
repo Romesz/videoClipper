@@ -178,7 +178,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     if(mouseBeforeX === null)
       return;
 
-    var x = event.clientX;
+    var x = e.clientX;
 
     if(x < mouseBeforeX) {
       if(rightContainer.find('img').length < 4) {
