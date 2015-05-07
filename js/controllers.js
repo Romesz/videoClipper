@@ -2,6 +2,11 @@
 (function () {
 app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval) {
   
+  $scope.playPauseButton = angular.element(document.querySelector('#playPause'));
+  $scope.seekBarRange = angular.element(document.querySelector('#seekBar')); 
+ 
+  $scope.mainVideoDuration = null;
+ 
   var fakeVideo = document.getElementById('fakeVideo');
   fakeVideo.muted = true;
   fakeVideo.playbackRate = 4.0;
@@ -299,17 +304,11 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
    
     $scope.mainVideo.find('source')[0].src = srcCutTime + '#t=' + currentTime + ',' + duration;
    
-    $scope.mainVideo[0].load();
+    $scope.mainVideoDuration = duration;
    
-    //console.log($scope.mainVideo.find('source')[0].src);
-    
-    //$scope.mainVideo[0].loop = true; //out does not work
-    // loop hack
-    $scope.mainVideo.on('pause', function(e) {
-      $scope.mainVideo.find('source')[0].src = srcCutTime + '#t=' + currentTime + ',' + duration;
-      $scope.mainVideo[0].load();
-      $scope.mainVideo[0].play();
-    });
+    $scope.seekBarRange[0].value = currentTime;
+   
+    $scope.mainVideo[0].load();
   };
 
 }]); 
