@@ -27,58 +27,84 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   
   $scope.imgArr  = new Array();
   $scope.counter = 0;
-  var intervalFirstPhase = null;
-  var intervalSecondPhase = null;
+  $scope.intervalFirstPhase = null;
+  $scope.intervalSecondPhase = null;
 
   var isWidth = imageSilder[0].clientWidth;
   var rescWidth = Math.round(resizableContainer[0].clientWidth / 100);
  
   fakeVideo.addEventListener('play', function(e) {
-    intervalFirstPhase = $interval(function() {
-      if(intervalFirstPhase == null) return;
-     
-      //$scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
-      //$scope.createImgTags($scope.counter, e.target.currentTime);
-      //$scope.counter++;
+   
+    $scope.videoHalfTime = parseInt(fakeVideo.duration / 2);
+    //console.log('videoHalfTime ' + $scope.videoHalfTime);
+   
+    $scope.intervalFirstPhase = $interval(function() {
      
       if($scope.imgArr.length === 12) {
         $scope.getRisContainerFrames();
-      } else if($scope.imgArr.length === 18) {
-        //console.log('18');
+      }
+     
+      //console.log('fakeVideo.currentTime ' + fakeVideo.currentTime);
+     
+      //if($scope.imgArr.length <= 18) {
+      if(parseInt(fakeVideo.currentTime) < parseInt($scope.videoHalfTime)) {
+        $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
+        $scope.createImgTags($scope.counter, e.target.currentTime);
+        $scope.counter++;
+      } else {
         fakeVideo.pause();
-        $interval.cancel(intervalFirstPhase);
-        intervalFirstPhase = null;
+        $interval.cancel($scope.intervalFirstPhase);
+        $scope.intervalFirstPhase = undefined;
        
+        //console.log($scope.imgArr.length);
         console.log('FIRSTPHASE - generation end');
+      }
+     
+     
+     /*
+      if($scope.imgArr.length === 12) {
+        $scope.getRisContainerFrames();
+      } else if($scope.imgArr.length === 18) {
+        fakeVideo.pause();
+        $interval.cancel($scope.intervalFirstPhase);
+        $scope.intervalFirstPhase = null;
+       
+        console.log($scope.imgArr.length);
+        console.log('FIRSTPHASE - generation end');
+       
+        //return;
       } else {
         $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
         $scope.createImgTags($scope.counter, e.target.currentTime);
         $scope.counter++;
       }
+      */
 
-    }, 150);
+    }, 100);
    
   }, false);
   // this does not work in the angular way... fakeVideo.on('play', function(e) {
   // I got an error about the canvas context drawImage does not defined.
  
   $scope.generateImgs = function() {
+   if($scope.intervalFirstPhase !== undefined) {
+     console.log('return')
+     return;
+   }
+    
+   $scope.videoHalfTime += 5;
+   console.log('$scope.videoHalfTime: ' + $scope.videoHalfTime);
    
-   var imgCtime = parseInt($scope.clickedImgCtime) + 70;
-   //console.log('imgCtime: ' + imgCtime);
-   
-   intervalSecondPhase = $interval(function() {
-     
-     if(intervalSecondPhase == null) return;
+   $scope.intervalSecondPhase = $interval(function() {
     
      //console.log('fakeVideo.currentTime: ' + fakeVideo.currentTime);
     
-     if(imgCtime < fakeVideo.currentTime || parseInt(fakeVideo.currentTime) == 0) {
+     if($scope.videoHalfTime < fakeVideo.currentTime || parseInt(fakeVideo.currentTime) == 0) {
       
        fakeVideo.pause();
-       $interval.cancel(intervalSecondPhase);
-       intervalSecondPhase = null;
-       //console.log('generation end');
+       $interval.cancel($scope.intervalSecondPhase);
+       $scope.intervalSecondPhase = null;
+       console.log('SECONDPHASE - generation end');
      } else {
       
        //console.log('add ' + fakeVideo.currentTime);
@@ -88,7 +114,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
        $scope.createImgTags($scope.counter, fakeVideo.currentTime);
        $scope.counter++;  
      }
-   }, 150);
+   }, 100);
   };
   
   function goLeft() {
@@ -157,6 +183,30 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
 
   $scope.sliderMouseDown = function(e) {
     e.preventDefault();
+   
+    // TODO: resizer
+    // if mouse down first px of the container --> left resizer
+    // if mouse down last px of the container --> right resizer
+   
+    var mouseDownPosX = e.clientX;
+    var resContainerWidth = resizableContainer[0].innerWidth;
+   
+    if(mouseDownPosX > resContainerWidth- 10) {
+      // right res
+      console.log('right res') 
+     
+     
+      return;
+    }   
+   
+    if(mouseDownPosX < resContainerWidth - (resContainerWidth - 10)) {
+      // left res
+      console.log('left res') 
+      return;
+    }
+   
+   
+   
     mouseBeforeX = true;
    
     var rcImgs = rightContainer.find('img');
@@ -165,8 +215,6 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     $scope.clickedImgCtime = rcImgCtime;
    
     $scope.generateImgs();
-    // if I slide it works
-    // If I left the animation without slide ... nope
    
 
     $scope.mainVideo[0].pause();
@@ -174,12 +222,20 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
 
   $scope.sliderMouseUp = function(e) {
     e.preventDefault();
+   
     mouseBeforeX = null;
   };
 
   $scope.sliderMove = function(e) {
     e.preventDefault();
 
+   
+    // TODO: resizer
+    // Min width 3 pic
+    // Max width 10 pic
+    // Get the nearest picture and align it
+    // Put the cropped pictures to the other 2 contaiers
+   
     if(mouseBeforeX === null)
       return;
 

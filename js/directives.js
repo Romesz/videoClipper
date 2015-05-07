@@ -13,7 +13,7 @@ app.directive('mainVideo', function() {
         $scope.seekBarRange[0].max = mainVideo[0].duration;
         $scope.seekBarRange[0].value = mainVideo[0].currentTime;
         //$scope.seekValue = mainVideo[0].currentTime;
-        console.log('currentTime ' + mainVideo[0].currentTime)
+        //console.log('currentTime ' + mainVideo[0].currentTime)
       });
       
       mainVideo.on('play', function(e) {

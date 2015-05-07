@@ -53,3 +53,6 @@ html, body {
         width: 100px;
         max-width: 100%;
       }
+    #leftResize, #rightResize {
+      display: inline-block;
+    }
