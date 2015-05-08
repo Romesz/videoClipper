@@ -2,7 +2,8 @@
   "name": "videoClipper",
   "version": "0.0.1",
   "devDependencies": {
-    "gulp": "*",
+    "gulp": "^3.8.11",
+    "gulp-uglify": "*",
     "browser-sync": "^1.8.1"
   }
 }

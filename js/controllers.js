@@ -184,24 +184,21 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   $scope.sliderMouseDown = function(e) {
     e.preventDefault();
    
-    // TODO: resizer
-    // if mouse down first px of the container --> left resizer
-    // if mouse down last px of the container --> right resizer
-   
     var mouseDownPosX = e.clientX;
-    var resContainerWidth = resizableContainer[0].innerWidth;
-   
-    if(mouseDownPosX > resContainerWidth- 10) {
+    var resContainerOffsetLeft = resizableContainer[0].offsetLeft;
+    var resContainerOffsetRight = resContainerOffsetLeft + resizableContainer[0].offsetWidth;
+
+    if(mouseDownPosX < resContainerOffsetLeft + 15) {
       // right res
-      console.log('right res') 
+      console.log('left res');
      
      
       return;
     }   
    
-    if(mouseDownPosX < resContainerWidth - (resContainerWidth - 10)) {
+    if(mouseDownPosX > resContainerOffsetRight - 15) {
       // left res
-      console.log('left res') 
+      console.log('right res'); 
       return;
     }
    
