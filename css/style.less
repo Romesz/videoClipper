@@ -25,7 +25,8 @@ html, body {
       display: inline-block;
       height: 90px;
       min-width: 100px;
-      max-width: 20%;
+      //max-width: 20%;
+      max-width: 300px;
       //width: 100px;
       opacity: 0.5;
     }
@@ -34,19 +35,28 @@ html, body {
       display: inline-block;
       height: 90px;
       min-width: 100px;
-      max-width: 20%;
+      //max-width: 20%;
+      max-width: 300px;
       opacity: 0.5;
     }
     #resizableContainer {
       display: inline-block;
       border: 5px solid blue;
+      border-left-width: 15px;
+      border-right-width: 15px;
+      
       border-radius: 5px;
       height: 100px;
       width: 800px;
       z-index: 99;
 
-      max-width: 60%;
+      //max-width: 60%;
+      max-width: 800px;
       overflow: hidden;
+      
+      &:hover {
+        cursor: move;
+      }
     }
       img {
         display: inline-block;

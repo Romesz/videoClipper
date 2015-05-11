@@ -40,7 +40,7 @@ app.directive('mainVideo', function() {
         var cTime = this.currentTime;
         $scope.getTheImgbyTime(cTime);
         
-        $scope.generateImgs();     
+        //$scope.generateImgs();     
       });
       
       $scope.playMainVideo = function(e) {

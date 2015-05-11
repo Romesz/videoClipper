@@ -180,29 +180,30 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   };
 
   var mouseBeforeX = null;
+  var mouseCanFrameSliderLeft = null;
+  var mouseCanFrameSliderRight = null;
+  var resizeMouseDownPosX = null;
 
   $scope.sliderMouseDown = function(e) {
     e.preventDefault();
    
-    var mouseDownPosX = e.clientX;
+    resizeMouseDownPosX = e.clientX;
     var resContainerOffsetLeft = resizableContainer[0].offsetLeft;
     var resContainerOffsetRight = resContainerOffsetLeft + resizableContainer[0].offsetWidth;
 
-    if(mouseDownPosX < resContainerOffsetLeft + 15) {
-      // right res
-      console.log('left res');
-     
-     
-      return;
-    }   
-   
-    if(mouseDownPosX > resContainerOffsetRight - 15) {
-      // left res
-      console.log('right res'); 
-      return;
+    if(resizeMouseDownPosX !== null) {
+      if(resizeMouseDownPosX < resContainerOffsetLeft + 15) {
+        //console.log('left res');
+        mouseCanFrameSliderLeft = true;
+
+        return;
+      } else if(resizeMouseDownPosX > resContainerOffsetRight - 15) {
+        //console.log('right res');
+        mouseCanFrameSliderRight = true;
+
+        return;
+      }
     }
-   
-   
    
     mouseBeforeX = true;
    
@@ -211,7 +212,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     var rcImgCtime = rcImgs[rcImgsLen - 1].dataset.ctime;
     $scope.clickedImgCtime = rcImgCtime;
    
-    $scope.generateImgs();
+    //$scope.generateImgs();
    
 
     $scope.mainVideo[0].pause();
@@ -221,42 +222,52 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     e.preventDefault();
    
     mouseBeforeX = null;
+    mouseCanFrameSliderLeft = null;
+    mouseCanFrameSliderRight = null;
+    resizeMouseDownPosX = null;
   };
 
   $scope.sliderMove = function(e) {
     e.preventDefault();
-
    
-    // TODO: resizer
-    // Min width 3 pic
-    // Max width 10 pic
-    // Get the nearest picture and align it
-    // Put the cropped pictures to the other 2 contaiers
-   
-    if(mouseBeforeX === null)
+    if(mouseBeforeX === null && mouseCanFrameSliderLeft === null && mouseCanFrameSliderRight === null)
       return;
-
+   
     var x = e.clientX;
+   
+    if(mouseBeforeX !== null) {
 
-    if(x < mouseBeforeX) {
-      if(rightContainer.find('img').length < 4) {
-       console.log('RIGHT - no elem');
-       return;
+      if(x < mouseBeforeX) {
+        if(rightContainer.find('img').length < 4) {
+         console.log('RIGHT - no elem');
+         return;
+        }
+
+        goRight();
+      } else {
+        goLeft();
       }
+      mouseBeforeX = x;
+
+
+      //var getCurrentImgTime = resizableContainer.find('img').attr('data-ctime');
+      //$scope.mainVideo.currentTime = getCurrentImgTime;
+
+      $scope.hidePictures();
+      $scope.getRisContainerFrames();
+      //$scope.mainVideo[0].play();
+    } else if(mouseCanFrameSliderLeft !== null) {
      
-      goRight();
-    } else {
-      goLeft();
+      console.log('LEFT HANDLE - now we have to resize the thing');
+     
+      $scope.setSliderFramesLeft(x);
+       
+    } else if(mouseCanFrameSliderRight !== null) {
+     
+      console.log('RIGHT HANDLE - now we have to resize the thing');
+     
+      //$scope.setSliderFramesRight(x);
     }
-    mouseBeforeX = x;
-
-
-    //var getCurrentImgTime = resizableContainer.find('img').attr('data-ctime');
-    //$scope.mainVideo.currentTime = getCurrentImgTime;
-
-    $scope.hidePictures();
-    $scope.getRisContainerFrames();
-    //$scope.mainVideo[0].play();
   };
 
   
@@ -342,6 +353,59 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     var getResCImgLast = getResCImgLast.dataset.ctime;
    
     $scope.addShortVideo(getResCImgFirst, getResCImgLast);
+  };
+ 
+  $scope.setSliderFramesLeft = function(mousePosX) {
+    // TODO :
+    // put the first img to the leftCont
+   
+    var resConWidth = resizableContainer[0].clientWidth;
+    var rightConWidth = rightContainer[0].clientWidth;
+   
+    if(resConWidth > 300 && /*||*/ resConWidth < 900) { // this condition is not correct during the resize
+      if(resizeMouseDownPosX < mousePosX) {
+        console.log('LEFT - alignment happend');
+        resConWidth -= 100;
+        rightConWidth += 100;
+       
+        var rcImgs = resizableContainer.find('img');
+        var rcImglast = rcImgs[0];
+
+        leftContainer[0].appendChild(rcImglast);
+       
+      } else if(resizeMouseDownPosX > mousePosX) {
+        console.log('RIGHT - alignment happend');
+        resConWidth += 100;
+        rightConWidth -= 100;
+       
+        var lcImgs = leftContainer.find('img');
+        var lcImglast = null;
+
+
+        for(var i = lcImgs.length; i > 0 ; i--) {
+          lcImglast = lcImgs[i - 1];
+          break;
+        }
+        resizableContainer[0].insertBefore(lcImglast, resizableContainer[0].firstChild);
+      }
+     
+      resizableContainer.css('width', resConWidth + 'px');
+      rightContainer
+        .css('width', rightConWidth + 'px')
+        .css('max-width', rightConWidth + 'px');
+     
+    } else {
+      console.log('OUT OF THE RESCONTAINER SCOPE');
+      console.log('resizeMouseDownPosX ' + resizeMouseDownPosX);
+      console.log('mousePosX ' + mousePosX);
+     
+      mouseBeforeX = null;
+      mouseCanFrameSliderLeft = null;
+      mouseCanFrameSliderRight = null;
+      resizeMouseDownPosX = null;
+    }
+   
+    console.log(resConWidth);
   };
  
   $scope.addShortVideo = function(currentTime, duration) {
