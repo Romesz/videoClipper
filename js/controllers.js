@@ -1,4 +1,19 @@
 // http://stackoverflow.com/questions/15165991/uncaught-typeerror-type-error-with-drawimage
+/*
+  * TODO:
+  *
+  * Finish Handle resize (rightCon visibility missing)  !!!!
+     * Check leftCon and rightCon ends
+  
+  * Picture generation refine !!!
+  * Extended search !!!!
+  * Design play pause button and range !
+  * Browser Test !
+  
+  * [! is priority, more means higer]
+*/
+
+
 (function () {
 app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval) {
   
@@ -33,10 +48,12 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   var isWidth = imageSilder[0].clientWidth;
   var rescWidth = Math.round(resizableContainer[0].clientWidth / 100);
  
+  var videoHalfTime = 0;
+  var videoHalfTimeExtend = 0;
+ 
   fakeVideo.addEventListener('play', function(e) {
    
-    $scope.videoHalfTime = parseInt(fakeVideo.duration / 2);
-    //console.log('videoHalfTime ' + $scope.videoHalfTime);
+    videoHalfTime = parseInt(fakeVideo.duration / 2);
    
     $scope.intervalFirstPhase = $interval(function() {
      
@@ -46,39 +63,20 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
      
       //console.log('fakeVideo.currentTime ' + fakeVideo.currentTime);
      
-      //if($scope.imgArr.length <= 18) {
-      if(parseInt(fakeVideo.currentTime) < parseInt($scope.videoHalfTime)) {
+      if(parseInt(fakeVideo.currentTime) < videoHalfTime) {
         $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
         $scope.createImgTags($scope.counter, e.target.currentTime);
         $scope.counter++;
       } else {
-        fakeVideo.pause();
-        $interval.cancel($scope.intervalFirstPhase);
-        $scope.intervalFirstPhase = undefined;
-       
-        //console.log($scope.imgArr.length);
-        console.log('FIRSTPHASE - generation end');
-      }
-     
-     
-     /*
-      if($scope.imgArr.length === 12) {
-        $scope.getRisContainerFrames();
-      } else if($scope.imgArr.length === 18) {
         fakeVideo.pause();
         $interval.cancel($scope.intervalFirstPhase);
         $scope.intervalFirstPhase = null;
        
-        console.log($scope.imgArr.length);
-        console.log('FIRSTPHASE - generation end');
+        videoHalfTimeExtend = videoHalfTime;
        
-        //return;
-      } else {
-        $scope.saveImgToArray($scope.context, fakeVideo, $scope.canvas);
-        $scope.createImgTags($scope.counter, e.target.currentTime);
-        $scope.counter++;
+        //console.log($scope.imgArr.length);
+        console.log('FIRSTPHASE - generation end');
       }
-      */
 
     }, 100);
    
@@ -87,19 +85,34 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   // I got an error about the canvas context drawImage does not defined.
  
   $scope.generateImgs = function() {
-   if($scope.intervalFirstPhase !== undefined) {
-     console.log('return')
+   
+   if($scope.intervalFirstPhase !== null) {
+     console.log('RETURN - cannot start generation second phase becuase the first phase have not finished');
+     return;
+   }
+   
+   if($scope.intervalSecondPhase !== null) {
+     console.log('RETURN - cannot start generation second phase becuase this job has not finished');
      return;
    }
     
-   $scope.videoHalfTime += 5;
-   console.log('$scope.videoHalfTime: ' + $scope.videoHalfTime);
+   videoHalfTimeExtend += 5;
+   
+   if(videoHalfTimeExtend > fakeVideo.duration) {
+     console.log('RETURN - Video is over');
+     return;
+   }
+   
+   console.log('fakeVideo.currentTime: ' + fakeVideo.currentTime);
+   console.log('videoHalfTimeExtend: ' + videoHalfTimeExtend);
+   
+   //console.log('videoHalfTimeExtend: ' + videoHalfTimeExtend);
    
    $scope.intervalSecondPhase = $interval(function() {
     
-     //console.log('fakeVideo.currentTime: ' + fakeVideo.currentTime);
+     console.log(videoHalfTimeExtend < parseInt(fakeVideo.currentTime) || parseInt(fakeVideo.currentTime) == 0)
     
-     if($scope.videoHalfTime < fakeVideo.currentTime || parseInt(fakeVideo.currentTime) == 0) {
+     if(videoHalfTimeExtend < parseInt(fakeVideo.currentTime) || parseInt(fakeVideo.currentTime) == 0) {
       
        fakeVideo.pause();
        $interval.cancel($scope.intervalSecondPhase);
@@ -179,33 +192,31 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     }
   };
 
-  var mouseBeforeX = null;
-  var mouseCanFrameSliderLeft = null;
-  var mouseCanFrameSliderRight = null;
-  var resizeMouseDownPosX = null;
+  $scope.mouseBeforeX = null;
+  $scope.mouseCanFrameSliderLeft = null;
+  $scope.mouseCanFrameSliderRight = null;
+  $scope.resizeMouseDownPosX = null;
 
   $scope.sliderMouseDown = function(e) {
     e.preventDefault();
    
-    resizeMouseDownPosX = e.clientX;
+    $scope.resizeMouseDownPosX = e.clientX;
     var resContainerOffsetLeft = resizableContainer[0].offsetLeft;
     var resContainerOffsetRight = resContainerOffsetLeft + resizableContainer[0].offsetWidth;
 
-    if(resizeMouseDownPosX !== null) {
-      if(resizeMouseDownPosX < resContainerOffsetLeft + 15) {
-        //console.log('left res');
-        mouseCanFrameSliderLeft = true;
+    if($scope.resizeMouseDownPosX < resContainerOffsetLeft + 15) {
+      //console.log('left res');
+      $scope.mouseCanFrameSliderLeft = true;
 
-        return;
-      } else if(resizeMouseDownPosX > resContainerOffsetRight - 15) {
-        //console.log('right res');
-        mouseCanFrameSliderRight = true;
+      return;
+    } else if($scope.resizeMouseDownPosX > resContainerOffsetRight - 15) {
+      //console.log('right res');
+      $scope.mouseCanFrameSliderRight = true;
 
-        return;
-      }
+      return;
     }
    
-    mouseBeforeX = true;
+    $scope.mouseBeforeX = true;
    
     var rcImgs = rightContainer.find('img');
     var rcImgsLen = rcImgs.length;
@@ -221,23 +232,25 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
   $scope.sliderMouseUp = function(e) {
     e.preventDefault();
    
-    mouseBeforeX = null;
-    mouseCanFrameSliderLeft = null;
-    mouseCanFrameSliderRight = null;
-    resizeMouseDownPosX = null;
+    $scope.mouseBeforeX = null;
+    $scope.mouseCanFrameSliderLeft = null;
+    $scope.mouseCanFrameSliderRight = null;
+    $scope.resizeMouseDownPosX = null;
+   
+    $scope.getRisContainerFrames();
   };
 
   $scope.sliderMove = function(e) {
     e.preventDefault();
    
-    if(mouseBeforeX === null && mouseCanFrameSliderLeft === null && mouseCanFrameSliderRight === null)
+    if($scope.mouseBeforeX === null && $scope.mouseCanFrameSliderLeft === null && $scope.mouseCanFrameSliderRight === null)
       return;
    
     var x = e.clientX;
    
-    if(mouseBeforeX !== null) {
+    if($scope.mouseBeforeX !== null) {
 
-      if(x < mouseBeforeX) {
+      if(x < $scope.mouseBeforeX) {
         if(rightContainer.find('img').length < 4) {
          console.log('RIGHT - no elem');
          return;
@@ -247,7 +260,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       } else {
         goLeft();
       }
-      mouseBeforeX = x;
+      $scope.mouseBeforeX = x;
 
 
       //var getCurrentImgTime = resizableContainer.find('img').attr('data-ctime');
@@ -256,17 +269,17 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       $scope.hidePictures();
       $scope.getRisContainerFrames();
       //$scope.mainVideo[0].play();
-    } else if(mouseCanFrameSliderLeft !== null) {
+    } else if($scope.mouseCanFrameSliderLeft !== null) {
      
       console.log('LEFT HANDLE - now we have to resize the thing');
      
-      $scope.setSliderFramesLeft(x);
+      $scope.setSliderByHandleLeft(x);
        
-    } else if(mouseCanFrameSliderRight !== null) {
+    } else if($scope.mouseCanFrameSliderRight !== null) {
      
       console.log('RIGHT HANDLE - now we have to resize the thing');
      
-      //$scope.setSliderFramesRight(x);
+      $scope.setSliderByHandleRight(x);
     }
   };
 
@@ -326,13 +339,43 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       leftImgs[leftImgsLen - 3].style.display = 'inline-block';
     }    
    
+    var resConImgLen = resizableContainer.find('img').length;
+    var iterator = null;
+   
+    switch(resConImgLen) {
+      case 8:
+        iterator = 3;
+        break;
+      case 7:
+        iterator = 4;
+        break;
+      case 6:
+        iterator = 5;
+        break;
+      case 5:
+        iterator = 6;
+        break;
+      case 4:
+        iterator = 7;
+        break;
+      case 3:
+        iterator = 8;
+        break;
+    }
+    // switch needs for resizeability
+   
     var rightImgs = rightContainer.find('img');
     var rightImgsLen = rightContainer.find('img').length;
     if(rightImgsLen >= 3) {
       rightImgs.css('display', 'none');
+      /*
       rightImgs[0].style.display = 'inline-block';
       rightImgs[1].style.display = 'inline-block';
       rightImgs[2].style.display = 'inline-block';
+      */
+      for(var i = 0 ; i < iterator ; i++) {
+        rightImgs[i].style.display = 'inline-block';
+      }
     }
   };
  
@@ -355,57 +398,98 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     $scope.addShortVideo(getResCImgFirst, getResCImgLast);
   };
  
-  $scope.setSliderFramesLeft = function(mousePosX) {
-    // TODO :
-    // put the first img to the leftCont
+  $scope.setSliderByHandleLeft = function(mousePosX) {
    
     var resConWidth = resizableContainer[0].clientWidth;
     var rightConWidth = rightContainer[0].clientWidth;
+
+    if($scope.resizeMouseDownPosX < mousePosX && resConWidth > 300) {
+      console.log('LEFT - alignment happend');
+      resConWidth -= 100;
+      rightConWidth += 100;
+
+      var rcImgs = resizableContainer.find('img');
+      var rcImglast = rcImgs[0];
+
+      leftContainer[0].appendChild(rcImglast);
+
+    } else if($scope.resizeMouseDownPosX > mousePosX && resConWidth < 800) {
+      console.log('RIGHT - alignment happend');
+      resConWidth += 100;
+      rightConWidth -= 100;
+
+      var lcImgs = leftContainer.find('img');
+      var lcImglast = null;
+
+
+      for(var i = lcImgs.length; i > 0 ; i--) {
+        lcImglast = lcImgs[i - 1];
+        break;
+      }
+      resizableContainer[0].insertBefore(lcImglast, resizableContainer[0].firstChild);
+    } else {
+      console.log('OUT OF THE RESCONTAINER SCOPE');
+
+      $scope.mouseBeforeX = null;
+      $scope.mouseCanFrameSliderLeft = null;
+      $scope.mouseCanFrameSliderRight = null;
+      $scope.resizeMouseDownPosX = null;     
+    }
+
+    $scope.hidePictures();
    
-    if(resConWidth > 300 && /*||*/ resConWidth < 900) { // this condition is not correct during the resize
-      if(resizeMouseDownPosX < mousePosX) {
-        console.log('LEFT - alignment happend');
-        resConWidth -= 100;
-        rightConWidth += 100;
-       
-        var rcImgs = resizableContainer.find('img');
-        var rcImglast = rcImgs[0];
+    resizableContainer.css('width', resConWidth + 'px');
+    rightContainer
+      .css('width', rightConWidth + 'px')
+      .css('max-width', rightConWidth + 'px');
+  }; 
+ 
+  $scope.setSliderByHandleRight = function(mousePosX) {
+   
+    var resConWidth = resizableContainer[0].clientWidth;
+    var rightConWidth = rightContainer[0].clientWidth;
 
-        leftContainer[0].appendChild(rcImglast);
-       
-      } else if(resizeMouseDownPosX > mousePosX) {
-        console.log('RIGHT - alignment happend');
-        resConWidth += 100;
-        rightConWidth -= 100;
-       
-        var lcImgs = leftContainer.find('img');
-        var lcImglast = null;
+    if($scope.resizeMouseDownPosX < mousePosX && resConWidth < 800) {
+      console.log('RIGHT - alignment happend');
+      resConWidth += 100;
+      rightConWidth -= 100;     
 
-
-        for(var i = lcImgs.length; i > 0 ; i--) {
-          lcImglast = lcImgs[i - 1];
-          break;
-        }
-        resizableContainer[0].insertBefore(lcImglast, resizableContainer[0].firstChild);
+      var rsImgs = resizableContainer.find('img');
+      var rsImglast = null;
+     
+      for(var i = rsImgs.length; i > 0 ; i--) {
+        rsImglast = rsImgs[i - 1];
+        break;
       }
      
-      resizableContainer.css('width', resConWidth + 'px');
-      rightContainer
-        .css('width', rightConWidth + 'px')
-        .css('max-width', rightConWidth + 'px');
+      rightContainer[0].insertBefore(rsImglast, rightContainer[0].firstChild);
+
+    } else if($scope.resizeMouseDownPosX > mousePosX && resConWidth > 300) {
+      console.log('LEFT - alignment happend');
+     
+      resConWidth -= 100;
+      rightConWidth += 100;
+
+      var rcImgs = rightContainer.find('img');
+      var rcImglast = rcImgs[0];
+
+      resizableContainer[0].appendChild(rcImglast);
      
     } else {
       console.log('OUT OF THE RESCONTAINER SCOPE');
-      console.log('resizeMouseDownPosX ' + resizeMouseDownPosX);
-      console.log('mousePosX ' + mousePosX);
      
-      mouseBeforeX = null;
-      mouseCanFrameSliderLeft = null;
-      mouseCanFrameSliderRight = null;
-      resizeMouseDownPosX = null;
+      $scope.mouseBeforeX = null;
+      $scope.mouseCanFrameSliderLeft = null;
+      $scope.mouseCanFrameSliderRight = null;
+      $scope.resizeMouseDownPosX = null;     
     }
    
-    console.log(resConWidth);
+    //$scope.hidePictures();
+   
+    resizableContainer.css('width', resConWidth + 'px');
+    rightContainer
+      .css('width', rightConWidth + 'px')
+      .css('max-width', rightConWidth + 'px');
   };
  
   $scope.addShortVideo = function(currentTime, duration) {

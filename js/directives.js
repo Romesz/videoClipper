@@ -40,7 +40,7 @@ app.directive('mainVideo', function() {
         var cTime = this.currentTime;
         $scope.getTheImgbyTime(cTime);
         
-        //$scope.generateImgs();     
+        $scope.generateImgs();     
       });
       
       $scope.playMainVideo = function(e) {
@@ -159,3 +159,23 @@ app.directive('fakeVideo', function($interval) {
   }
 });
 */
+
+/*
+* Helper for Resizing the container
+*/
+app.directive('resize', function($window) {
+  return {
+    link: function($scope) {
+      angular.element($window).on('mouseup', function(e) {
+        e.preventDefault();
+        
+        $scope.mouseBeforeX = null;
+        $scope.mouseCanFrameSliderLeft = null;
+        $scope.mouseCanFrameSliderRight = null;
+        $scope.resizeMouseDownPosX = null;
+
+        $scope.getRisContainerFrames();
+      });
+    }
+  }
+});
