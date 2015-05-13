@@ -4,9 +4,9 @@
   *
   * Finish Handle resize (rightCon visibility missing)  !!!!
      * Check leftCon and rightCon ends
-  
-  * Picture generation refine !!!
-  * Extended search !!!!
+
+  * play/stop button issue !!
+
   * Design play pause button and range !
   * Browser Test !
   
@@ -24,8 +24,9 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
  
   var fakeVideo = document.getElementById('fakeVideo');
   fakeVideo.muted = true;
-  fakeVideo.playbackRate = 4.0;
+  //fakeVideo.playbackRate = 4.0;
   fakeVideo.loop = false;
+  $scope.fakeVideo = fakeVideo;
   
   var imageSilder = angular.element(document.querySelector('#imageSilder'));
   var resizableContainer = angular.element(document.querySelector('#resizableContainer'));
@@ -53,7 +54,8 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
  
   fakeVideo.addEventListener('play', function(e) {
    
-    videoHalfTime = parseInt(fakeVideo.duration / 2);
+    //videoHalfTime = parseInt(fakeVideo.duration / 2);
+    videoHalfTime = parseInt(fakeVideo.duration);
    
     $scope.intervalFirstPhase = $interval(function() {
      
@@ -271,13 +273,13 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       //$scope.mainVideo[0].play();
     } else if($scope.mouseCanFrameSliderLeft !== null) {
      
-      console.log('LEFT HANDLE - now we have to resize the thing');
+      //console.log('LEFT HANDLE - now we have to resize the thing');
      
       $scope.setSliderByHandleLeft(x);
        
     } else if($scope.mouseCanFrameSliderRight !== null) {
      
-      console.log('RIGHT HANDLE - now we have to resize the thing');
+      //console.log('RIGHT HANDLE - now we have to resize the thing');
      
       $scope.setSliderByHandleRight(x);
     }
@@ -404,7 +406,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     var rightConWidth = rightContainer[0].clientWidth;
 
     if($scope.resizeMouseDownPosX < mousePosX && resConWidth > 300) {
-      console.log('LEFT - alignment happend');
+      //console.log('LEFT - alignment happend');
       resConWidth -= 100;
       rightConWidth += 100;
 
@@ -414,7 +416,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       leftContainer[0].appendChild(rcImglast);
 
     } else if($scope.resizeMouseDownPosX > mousePosX && resConWidth < 800) {
-      console.log('RIGHT - alignment happend');
+      //console.log('RIGHT - alignment happend');
       resConWidth += 100;
       rightConWidth -= 100;
 

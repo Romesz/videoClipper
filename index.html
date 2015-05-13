@@ -17,7 +17,7 @@
       <div id="video-controls">
         
         <button type="button" id="playPause" ng-click="playMainVideo($event)">Play</button>
-        <input type="range" id="seekBar" ng-change="seekMainVideo()" ng-model="seekValue">
+        <input type="range" id="seekBar" ng-change="seekMainVideo()" ng-model="seekValue" ng-mousedown="setMaxValue($event)">
       </div>
       <!-- Video Controls -->
     </div>

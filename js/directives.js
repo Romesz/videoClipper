@@ -40,14 +40,19 @@ app.directive('mainVideo', function() {
         var cTime = this.currentTime;
         $scope.getTheImgbyTime(cTime);
         
-        $scope.generateImgs();     
+        //$scope.generateImgs();     
       });
       
       $scope.playMainVideo = function(e) {
+        
+        console.log('state of the video ' + mainVideo[0].paused);
+        
         if(mainVideo[0].paused) {
+          console.log('play')
           mainVideo[0].play();
           $scope.playPauseButton.html('Stop');
         } else {
+          console.log('pause')
           mainVideo[0].pause();
           $scope.playPauseButton.html('Play');
         }
@@ -63,7 +68,13 @@ app.directive('mainVideo', function() {
         var cTime = $scope.seekBarRange[0].value;
         $scope.getTheImgbyTime(cTime);
         
-        $scope.generateImgs();
+        //$scope.generateImgs();
+      };
+      
+      $scope.setMaxValue = function() {
+        console.log($scope.seekBarRange[0].max);
+        $scope.seekBarRange[0].max = $scope.fakeVideo.currentTime;
+        console.log($scope.seekBarRange[0].max);
       };
       
       $scope.mainVideo = mainVideo;
