@@ -14,7 +14,6 @@
 (function () {
 app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval) {
   
-  $scope.playPauseButton = angular.element(document.querySelector('#playPause'));
   $scope.seekBarRange = angular.element(document.querySelector('#seekBar')); 
  
   $scope.mainVideoDuration = null;
@@ -507,7 +506,8 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
    
     $scope.mainVideoDuration = duration;
    
-    $scope.seekBarRange[0].value = currentTime;
+    //$scope.seekBarRange[0].value = currentTime;
+    $scope.seekBar[0].value = currentTime;
    
     $scope.mainVideo[0].load();
   };
