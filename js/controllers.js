@@ -2,15 +2,12 @@
 /*
   * TODO:
   *
-  * Finish Handle resize (rightCon visibility missing)  !!!!
-     * Check leftCon and rightCon ends
-
   * play/stop button issue !!
-
+  * Range issue !!!
   * Design play pause button and range !
   * Browser Test !
   
-  * [! is priority, more means higer]
+  * [! is priority, more means higher]
 */
 
 
@@ -456,6 +453,18 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       resConWidth += 100;
       rightConWidth -= 100;     
 
+     
+      var rcImgs = rightContainer.find('img');
+      var rcImglast = rcImgs[0];
+
+      resizableContainer[0].appendChild(rcImglast);
+
+    } else if($scope.resizeMouseDownPosX > mousePosX && resConWidth > 300) {
+      console.log('LEFT - alignment happend');
+     
+      resConWidth -= 100;
+      rightConWidth += 100;
+      
       var rsImgs = resizableContainer.find('img');
       var rsImglast = null;
      
@@ -465,17 +474,6 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
       }
      
       rightContainer[0].insertBefore(rsImglast, rightContainer[0].firstChild);
-
-    } else if($scope.resizeMouseDownPosX > mousePosX && resConWidth > 300) {
-      console.log('LEFT - alignment happend');
-     
-      resConWidth -= 100;
-      rightConWidth += 100;
-
-      var rcImgs = rightContainer.find('img');
-      var rcImglast = rcImgs[0];
-
-      resizableContainer[0].appendChild(rcImglast);
      
     } else {
       console.log('OUT OF THE RESCONTAINER SCOPE');

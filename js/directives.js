@@ -68,13 +68,15 @@ app.directive('mainVideo', function() {
         var cTime = $scope.seekBarRange[0].value;
         $scope.getTheImgbyTime(cTime);
         
+        $scope.seekBarRange[0].max = $scope.fakeVideo.currentTime;
+        
         //$scope.generateImgs();
       };
       
-      $scope.setMaxValue = function() {
-        console.log($scope.seekBarRange[0].max);
+      $scope.setMaxValue = function(e) {
+        //console.log($scope.seekBarRange[0].max);
         $scope.seekBarRange[0].max = $scope.fakeVideo.currentTime;
-        console.log($scope.seekBarRange[0].max);
+        //console.log($scope.seekBarRange[0].max);
       };
       
       $scope.mainVideo = mainVideo;
