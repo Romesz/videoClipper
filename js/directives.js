@@ -6,21 +6,20 @@ app.directive('mainVideo', function() {
     restrict: 'A',
     link: function($scope, mainVideo) {
       mainVideo.muted = true; //temporary
-      mainVideo.initSrc = mainVideo.find('source')[0].src;
       
-      mainVideo.on('loadeddata', function(e) {
-        $scope.seekBarRange[0].min = 0;
-        $scope.seekBarRange[0].max = mainVideo[0].duration;
-        $scope.seekBarRange[0].value = mainVideo[0].currentTime;
-        $scope.seekValue = mainVideo[0].currentTime;
+      mainVideo.on('loadeddata', function() {
+        seekBar.min = 0;
+        seekBar.max = mainVideo[0].duration;
+        seekBar.value = mainVideo[0].currentTime;
+        seekBar.seekValue = mainVideo[0].currentTime;
       });
       
-      mainVideo.on('play', function(e) {
-        $scope.playPauseButton.html('Stop');
+      mainVideo.on('play', function() {
+        $scope.playPause.html('Stop');
       }); 
       
-      mainVideo.on('pause', function(e) {
-        $scope.playPauseButton.html('Play');
+      mainVideo.on('pause', function() {
+        $scope.playPause.html('Play');
         
         // loop hack
         /*
@@ -33,42 +32,18 @@ app.directive('mainVideo', function() {
         */
       });
       
-      mainVideo.on('seeking', function(e) {
-        //mainVideo.find('source')[0].src = mainVideo.initSrc;
-        //mainVideo[0].load();
-        
-        var cTime = this.currentTime;
-        $scope.getTheImgbyTime(cTime);
-        
-        //$scope.generateImgs();     
-      });
-      
-      //ng-change="seekMainVideo()"
-      /*
-      $scope.seekMainVideo = function() {
+      mainVideo.on('seeking', function() {
         //console.log('seeking');
         
-        //console.log(mainVideo.initSrc);
         //mainVideo.find('source')[0].src = mainVideo.initSrc;
         //mainVideo[0].load();
         
-        var cTime = $scope.seekBarRange[0].value;
-        $scope.getTheImgbyTime(cTime);
-        
-        //$scope.seekBarRange[0].max = $scope.fakeVideo.currentTime;
-        
-        //$scope.generateImgs();
-      };
-      */
-      
-      //ng-mousedown="setMaxValue($event)"
-      /*
-      $scope.setMaxValue = function(e) {
-        //console.log($scope.seekBarRange[0].max);
-        $scope.seekBarRange[0].max = $scope.fakeVideo.currentTime;
-        //console.log($scope.seekBarRange[0].max);
-      };
-      */
+        //var cTime = this.currentTime;
+        //var cTime = mainVideo[0].currentTime;
+        var cTime = seekBar.value;
+        console.log(cTime);
+        $scope.getTheImgbyTime(cTime);     
+      });
       
       $scope.mainVideo = mainVideo;
       
@@ -96,9 +71,15 @@ app.directive('mainVideo', function() {
         var rightConImgs = $scope.rightContainer.find('img');
         var leftConImgs = $scope.leftContainer.find('img');
         
+        /*
+        console.log('firstImg ' + firstImg);
+        console.log('resConImgs[0].dataset.ctime ' + resConImgs[0].dataset.ctime);
+        console.log('condition ' + firstImg === resConImgs[0].dataset.ctime);
+        */
         
         if(parseInt(resConImgs[0].dataset.ctime) === parseInt(firstImg)) {
           //SEEKING --- do not have to align the images
+          console.log('SEEKING --- do not have to align the images');
           return;
         }
         
@@ -132,7 +113,7 @@ app.directive('mainVideo', function() {
         $scope.changeImgsBySeeker($scope.rightContainer , rightConImgsArr);
         
         $scope.hidePictures();
-        $scope.getRisContainerFrames();
+        //$scope.getRisContainerFrames();
       };
       
       $scope.changeImgsBySeeker = function(container, imgsArray) {
@@ -189,23 +170,25 @@ app.directive('playPause', function() {
   return {
     restrict: 'A',
     link: function($scope, playPause) {
-
+      
+      //var mainVideoEl = angular.element(document.querySelector('#mainVideo'))[0];
       
       playPause.on('click', function(e) {
         
-        console.log('state of video ' + $scope.mainVideo[0].paused);
+        //console.log('state of video ' + mainVideo.paused);
+        //console.log('state of mainVideoEl ' + mainVideoEl.paused);
         
-        if($scope.mainVideo[0].paused === true) {
-          console.log('play')
-          $scope.mainVideo[0].play();
-          $scope.playPauseButton.html('Stop');
+        if(mainVideo.paused === true) {
+          //console.log('play')
+          mainVideo.play();
+          playPause.html('Stop');
           
-          return;
-        } //else {
-          console.log('pause')
-          $scope.mainVideo[0].pause();
-          $scope.playPauseButton.html('Play');
-        //}
+          //return;
+        } else {
+          //console.log('pause')
+          mainVideo.pause();
+          playPause.html('Play');
+        }
         
       });
   
@@ -220,22 +203,23 @@ app.directive('seekBar', function() {
   return {
     restrict: 'A',
     link: function($scope, seekBar) {
-
+      
       seekBar.on('change', function(e) {
-        //console.log('seeking');
+        
+        console.log(e);
         
         //console.log(mainVideo.initSrc);
         //mainVideo.find('source')[0].src = mainVideo.initSrc;
         //mainVideo[0].load();
         
-        var cTime = $scope.seekBarRange[0].value;
-        $scope.getTheImgbyTime(cTime);
+        //var cTime = $scope.seekBarRange[0].value;
+        //var cTime = seekBar.value;
+        //$scope.getTheImgbyTime(cTime);
         
         //$scope.seekBarRange[0].max = $scope.fakeVideo.currentTime;
         
         //$scope.generateImgs();
       });
-  
       
       $scope.seekBar = seekBar; 
     }
