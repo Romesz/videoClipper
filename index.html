@@ -17,7 +17,7 @@
       <div id="video-controls">
         
         <button type="button" play-pause>Play</button>
-        <input type="range" seek-bar id="seekBar" ng-model="seekValue">
+        <input type="range" seek-bar id="seekBar" ng-change="seekRangeChange()" ng-model="seekValue" step="0.01"> <span>{{seekValue}}</span>
       </div>
       <!-- Video Controls -->
     </div>

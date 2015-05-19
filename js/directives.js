@@ -5,13 +5,20 @@ app.directive('mainVideo', function() {
   return {
     restrict: 'A',
     link: function($scope, mainVideo) {
-      mainVideo.muted = true; //temporary
       
       mainVideo.on('loadeddata', function() {
+        console.log('LOADEDDATA - video event happend');
+        
         seekBar.min = 0;
-        seekBar.max = mainVideo[0].duration;
-        seekBar.value = mainVideo[0].currentTime;
-        seekBar.seekValue = mainVideo[0].currentTime;
+        seekBar.value = this.currentTime;
+        $scope.seekValue = this.currentTime;
+        console.log('$scope.seekValue: ' + $scope.seekValue);
+        //seekBar.max = this.duration;
+        seekBar.max = fakeVideo.currentTime;
+        
+        this.muted = true; //temporary
+        
+        $scope.resizableContainer.find('img').css('display', 'inline-block');
       });
       
       mainVideo.on('play', function() {
@@ -41,7 +48,7 @@ app.directive('mainVideo', function() {
         //var cTime = this.currentTime;
         //var cTime = mainVideo[0].currentTime;
         var cTime = seekBar.value;
-        console.log(cTime);
+        //console.log(cTime);
         $scope.getTheImgbyTime(cTime);     
       });
       
@@ -204,22 +211,16 @@ app.directive('seekBar', function() {
     restrict: 'A',
     link: function($scope, seekBar) {
       
-      seekBar.on('change', function(e) {
+      $scope.seekRangeChange = function() {
         
-        console.log(e);
+        console.log('SEEKBAR --- change event');
         
-        //console.log(mainVideo.initSrc);
-        //mainVideo.find('source')[0].src = mainVideo.initSrc;
-        //mainVideo[0].load();
+        seekBar.value = $scope.seekValue;
+        seekBar.max = parseInt(fakeVideo.currentTime);
         
-        //var cTime = $scope.seekBarRange[0].value;
-        //var cTime = seekBar.value;
+        var cTime = seekBar.value;
         //$scope.getTheImgbyTime(cTime);
-        
-        //$scope.seekBarRange[0].max = $scope.fakeVideo.currentTime;
-        
-        //$scope.generateImgs();
-      });
+      };
       
       $scope.seekBar = seekBar; 
     }
