@@ -7,18 +7,19 @@ app.directive('mainVideo', function() {
     link: function($scope, mainVideo) {
       
       mainVideo.on('loadeddata', function() {
+        
         console.log('LOADEDDATA - video event happend');
         
         seekBar.min = 0;
-        seekBar.value = this.currentTime;
-        $scope.seekValue = this.currentTime;
-        console.log('$scope.seekValue: ' + $scope.seekValue);
-        //seekBar.max = this.duration;
-        seekBar.max = fakeVideo.currentTime;
+        //seekBar.value = this.currentTime;
+        //$scope.seekValue = this.currentTime;
+        //console.log('$scope.seekValue: ' + $scope.seekValue);
+        // Could not set it.....
+        
+        seekBar.max = this.duration;
+        //seekBar.max = fakeVideo.currentTime;
         
         this.muted = true; //temporary
-        
-        $scope.resizableContainer.find('img').css('display', 'inline-block');
       });
       
       mainVideo.on('play', function() {
@@ -29,14 +30,12 @@ app.directive('mainVideo', function() {
         $scope.playPause.html('Play');
         
         // loop hack
-        /*
         if(this.currentTime >= $scope.mainVideoDuration) {
           console.log('Video END');
           
           mainVideo[0].load();
           mainVideo[0].play();
         }
-        */
       });
       
       mainVideo.on('seeking', function() {
@@ -47,7 +46,9 @@ app.directive('mainVideo', function() {
         
         //var cTime = this.currentTime;
         //var cTime = mainVideo[0].currentTime;
+        
         var cTime = seekBar.value;
+        
         //console.log(cTime);
         $scope.getTheImgbyTime(cTime);     
       });
@@ -206,6 +207,7 @@ app.directive('playPause', function() {
 });
 
 //seek-bar
+
 app.directive('seekBar', function() {
   return {
     restrict: 'A',
@@ -215,11 +217,17 @@ app.directive('seekBar', function() {
         
         console.log('SEEKBAR --- change event');
         
-        seekBar.value = $scope.seekValue;
-        seekBar.max = parseInt(fakeVideo.currentTime);
+        seekBar.value = $scope.seekValue/*.toString()*/;
+        
+        //console.log('seekBar.value typeof String ');
+        //console.log(typeof seekBar.value === 'string');
+        //seekBar.max = fakeVideo.currentTime;
         
         var cTime = seekBar.value;
-        //$scope.getTheImgbyTime(cTime);
+        $scope.getTheImgbyTime(cTime);
+        
+        $scope.resizableContainer.find('img').css('display', 'inline-block');
+        mainVideo.load();
       };
       
       $scope.seekBar = seekBar; 

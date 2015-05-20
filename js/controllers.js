@@ -505,6 +505,9 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     $scope.mainVideoDuration = duration;
    
     mainVideo.load();
+   
+    seekBar.value = currentTime;
+    $scope.seekValue = currentTime;
   };
 
 }]); 

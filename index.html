@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="css/style.css"/>
   </head>
-  <body ng-app="videoClipper" ng-controller="videoCtrl" resize>
-
+  <body ng-app="videoClipper" ng-controller="videoCtrl"> <!-- has to include 'resize' directiva -->
+    
     <div id="mainVideoContainer">
       <video id="mainVideo" width="600" height="200" main-video>
         <source src="lib/Our_Story_in_1_Minute.mp4" type="video/mp4"/>
@@ -17,7 +17,7 @@
       <div id="video-controls">
         
         <button type="button" play-pause>Play</button>
-        <input type="range" seek-bar id="seekBar" ng-change="seekRangeChange()" ng-model="seekValue" step="0.01"> <span>{{seekValue}}</span>
+        <input type="range" seek-bar id="seekBar" ng-change="seekRangeChange()" ng-model="seekValue" step="0.1"> <span>{{seekValue}}</span>
       </div>
       <!-- Video Controls -->
     </div>
