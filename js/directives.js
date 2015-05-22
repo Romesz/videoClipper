@@ -217,7 +217,19 @@ app.directive('seekBar', function() {
         
         console.log('SEEKBAR --- change event');
         
-        seekBar.value = $scope.seekValue/*.toString()*/;
+        var rightContainerIMGLen = $scope.rightContainer.find('img').length;
+        var rightContainerLastIMG = $scope.rightContainer.find('img')[rightContainerIMGLen - 1].dataset.ctime;
+        
+        if(parseInt(rightContainerLastIMG) <= parseInt($scope.seekValue)) {
+          console.log('SEEKBAR --- return rightContainer end');
+          
+          seekBar.value = $scope.resizableContainer.find('img')[0].dataset.ctime;
+          $scope.seekValue = $scope.resizableContainer.find('img')[0].dataset.ctime;
+          
+          return;
+        }
+        
+        seekBar.value = $scope.seekValue;/*.toString()*/;
         
         //console.log('seekBar.value typeof String ');
         //console.log(typeof seekBar.value === 'string');
@@ -228,6 +240,8 @@ app.directive('seekBar', function() {
         
         $scope.resizableContainer.find('img').css('display', 'inline-block');
         mainVideo.load();
+        
+        $scope.getRisContainerFrames();
       };
       
       $scope.seekBar = seekBar; 
