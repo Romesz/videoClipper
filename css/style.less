@@ -40,7 +40,7 @@ html, body {
       opacity: 0.5;
     }
     #resizableContainer {
-      display: inline-block;
+      display: inline-block;      
       border: 5px solid blue;
       border-left-width: 15px;
       border-right-width: 15px;
@@ -53,6 +53,8 @@ html, body {
       //max-width: 60%;
       max-width: 800px;
       overflow: hidden;
+      
+      word-spacing: -4px; // hack:: There is a padding on images that causes white space between them
       
       &:hover {
         cursor: move;

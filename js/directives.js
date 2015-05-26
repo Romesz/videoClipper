@@ -19,6 +19,7 @@ app.directive('mainVideo', function() {
         seekBar.max = this.duration;
         //seekBar.max = fakeVideo.currentTime;
         
+        $scope.playPause.html('Play');
         this.muted = true; //temporary
       });
       
@@ -158,8 +159,9 @@ app.directive('fakeVideo', function($interval) {
 */
 app.directive('resize', function($window) {
   return {
-    link: function($scope) {
-      angular.element($window).on('mouseup', function(e) {
+    link: function($scope, el) {
+      //angular.element($window).on('mouseup', function(e) {
+      el.on('mouseup', function(e) {
         e.preventDefault();
         
         $scope.mouseBeforeX = null;

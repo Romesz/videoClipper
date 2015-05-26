@@ -364,11 +364,7 @@ app.controller('videoCtrl', ['$scope', '$interval', function ($scope, $interval)
     var rightImgsLen = rightContainer.find('img').length;
     if(rightImgsLen >= 3) {
       rightImgs.css('display', 'none');
-      /*
-      rightImgs[0].style.display = 'inline-block';
-      rightImgs[1].style.display = 'inline-block';
-      rightImgs[2].style.display = 'inline-block';
-      */
+     
       for(var i = 0 ; i < iterator ; i++) {
         rightImgs[i].style.display = 'inline-block';
       }
